@@ -37,9 +37,13 @@ class AuthController extends Controller
 
         $token = JWTAuth::fromUser($user);
         // 返回创建成功信息
-        return response()->json(compact('user', 'token'), 201);
+        return response()->json(['user'=>$user,'token'=>$token], 200);
     }
-
+    //        if (! $token = Auth::guard('api')->attempt($credentials)) {
+//            return response()->json(['error' => '无效的Token令牌'], 401);
+//        }
+//
+//        return response()->json(compact('token'));
     /**
      * 登录方法
      *
@@ -47,21 +51,19 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request){
+        // 获取用户名和密码
         $credentials = $request->only('username', 'password');
-//        if (! $token = Auth::guard('api')->attempt($credentials)) {
-//            return response()->json(['error' => '无效的Token令牌'], 401);
-//        }
-//
-//        return response()->json(compact('token'));
+
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => '无效的Token令牌'], 401);
+                return response()->json(['error' => '账号或密码有误']);
+            }else{
+                return response()->json(['success'=>'登录成功','token' => $token],200);
             }
         } catch (JWTException $e) {
             return response()->json(['error' => '用户名或者密码错误'], 500);
         }
 
-        return response()->json(['token' => $token]);
     }
 
     /**
