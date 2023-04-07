@@ -27,7 +27,7 @@ class AuthController extends Controller
 //          ，Laravel 会自动检查 password_confirmation 字段
         // 验证失败
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json($validator->errors());
         }
         // 添加用户
         $user = User::create([
@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         $token = JWTAuth::fromUser($user);
         // 返回创建成功信息
-        return response()->json(['user'=>$user,'token'=>$token], 200);
+        return response()->json(['user'=>$user,'token'=>$token]);
     }
     //        if (! $token = Auth::guard('api')->attempt($credentials)) {
 //            return response()->json(['error' => '无效的Token令牌'], 401);
@@ -83,6 +83,9 @@ class AuthController extends Controller
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function show(){
-        return Auth::user();
+        $user = JWTAuth::parseToken()->authenticate();
+
+        // 返回用户信息
+        return response()->json(compact('user'));
     }
 }

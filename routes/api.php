@@ -33,7 +33,7 @@ Route::group(['prefix'=>'/v1'],function (){
 //    Route::post('/user',[\App\Http\Controllers\AuthController::class,'show']);
 
     // 受保护的 api
-    Route::middleware('auth:api')->group(function(){
+    Route::middleware(['auth:api','jwt.auth'])->group(function(){
         Route::post('/logout',[\App\Http\Controllers\AuthController::class,'logout']);
         // 返回用户信息
         Route::get('/user',[\App\Http\Controllers\AuthController::class,'show']);
