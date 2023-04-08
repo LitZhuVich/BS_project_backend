@@ -46,4 +46,11 @@ class User extends Authenticatable implements JWTSubject
     public function username(){
         return 'username';
     }
+
+    public function isAdmin()
+    {
+        // '0:普通用户 1:超级管理员'
+        // 如果 权限信息是 1
+        return $this->UserRole === 1;
+    }
 }

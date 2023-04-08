@@ -39,13 +39,9 @@ class AuthController extends Controller
         // 返回创建成功信息
         return response()->json(['user'=>$user,'token'=>$token]);
     }
-    //        if (! $token = Auth::guard('api')->attempt($credentials)) {
-//            return response()->json(['error' => '无效的Token令牌'], 401);
-//        }
-//
-//        return response()->json(compact('token'));
+
     /**
-     * 登录方法
+     * 登录 获取token
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -67,6 +63,22 @@ class AuthController extends Controller
     }
 
     /**
+     * 刷新 token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        // 获取当前用户的 Token
+        $token = JWTAuth::getToken();
+
+        // 刷新 Token 并返回新的 Token
+        $newToken = JWTAuth::refresh($token);
+
+        return response()->json(['token' => $newToken]);
+    }
+
+    /**
      * 登出
      *
      * @return \Illuminate\Http\JsonResponse
@@ -74,11 +86,11 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => '成功登出']);
     }
 
     /**
-     * 显示登录用户，该方法已被中间件保护
+     * 解析JWT令牌 显示已登录的用户
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */

@@ -29,11 +29,11 @@ Route::group(['prefix'=>'/v1'],function (){
         return '1123';
     });
 
-    //
-//    Route::post('/user',[\App\Http\Controllers\AuthController::class,'show']);
-
     // 受保护的 api
     Route::middleware(['auth:api','jwt.auth'])->group(function(){
+        // 刷新用户的token
+        Route::get('/refresh',[\App\Http\Controllers\AuthController::class,'refresh']);
+        // 登出
         Route::post('/logout',[\App\Http\Controllers\AuthController::class,'logout']);
         // 返回用户信息
         Route::get('/user',[\App\Http\Controllers\AuthController::class,'show']);

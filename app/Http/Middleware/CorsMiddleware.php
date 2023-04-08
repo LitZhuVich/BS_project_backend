@@ -8,16 +8,16 @@ use Illuminate\Http\Request;
 class CorsMiddleware
 {
     /**
-     * Handle an incoming request.
+     * 检测跨域问题的中间件
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @param Request $request
+     * @param Closure $next
+     * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         $response = $next($request);
-//       允许请求的跨越目录: http://localhost:5173
+//       允许请求的跨越域名: http://localhost:5173
         $response->header('Access-Control-Allow-Origin', 'http://localhost:5173')
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
