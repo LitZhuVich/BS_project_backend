@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+
 class AuthController extends Controller
 {
     /**
@@ -27,17 +29,72 @@ class AuthController extends Controller
 //          ，Laravel 会自动检查 password_confirmation 字段
         // 验证失败
         if ($validator->fails()) {
-            return response()->json($validator->errors());
+            return response()->json($validator->errors(),404);
         }
         // 添加用户
+        // 使用 Argon2 哈希算法加密密码 memory 参数定义了哈希需要使用的内存大小，time 参数定义了哈希需要执行的时间，threads 参数定义了哈希算法需要使用的线程数。
         $user = User::create([
             'username' => $request->username,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password,['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i'])
         ]);
 
+        // 注册成功返回 token
         $token = JWTAuth::fromUser($user);
+
         // 返回创建成功信息
         return response()->json(['user'=>$user,'token'=>$token]);
+    }
+
+    /**
+     * 注册，有邮箱验证功能
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function registerCheckEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|unique:users|max:255',
+            'email' => 'required|string|unique:users|max:255|email:filter',
+            'password' => 'required|string|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $user = User::create([
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password, ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
+            'is_verified' => 0,
+            'email_verification_token' => Str::random(32),
+        ]);
+
+        Mail::to($user->email)->send(new VerifyEmail($user));
+
+        return response()->json(['message' => 'User registered successfully. Please check your email to verify your account.'], 201);
+    }
+
+    /**
+     * 验证邮箱
+     *
+     * @param $token
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyEmail($token)
+    {
+        $user = User::where('email_verification_token', $token)->first();
+
+        if (!$user) {
+            abort(404);
+        }
+
+        $user->is_verified = 1;
+        $user->email_verification_token = null;
+        $user->save();
+
+        return response()->json(['message' => 'Email verified successfully.'], 200);
     }
 
     /**
@@ -51,15 +108,14 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => '账号或密码有误']);
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['message' => '账号或密码有误']);
             }else{
-                return response()->json(['success'=>'登录成功','token' => $token],200);
+                return response()->json(['token' => $token],200);
             }
         } catch (JWTException $e) {
-            return response()->json(['error' => '用户名或者密码错误'], 500);
+            return response()->json(['message' => '用户名或者密码错误'], 500);
         }
-
     }
 
     /**
@@ -96,8 +152,10 @@ class AuthController extends Controller
      */
     public function show(){
         $user = JWTAuth::parseToken()->authenticate();
-
-        // 返回用户信息
-        return response()->json(compact('user'));
+        $user->load('role');
+        $role = $user->role;
+        $user->setAttribute('role_name', $role->role_name);
+        // 返回用户信息`
+        return response()->json($user);
     }
 }

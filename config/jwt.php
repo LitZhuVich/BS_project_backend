@@ -100,8 +100,8 @@ return [
     | Notice: If you set this to null you should remove 'exp' element from 'required_claims' list.
     |
     */
-//    设置令牌默认可用 一个月
-    'ttl' => env('JWT_TTL', 43776),
+//    设置令牌默认可用 一星期
+    'ttl' => env('JWT_TTL', 10080),
 
     /*
     |--------------------------------------------------------------------------
@@ -120,7 +120,8 @@ return [
     |
     */
 
-    'refresh_ttl' => env('JWT_REFRESH_TTL', 20160),
+// 表示token的可刷新时间 一天
+    'refresh_ttl' => env('JWT_REFRESH_TTL', 1440),
 
     /*
     |--------------------------------------------------------------------------

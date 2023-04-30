@@ -24,6 +24,8 @@ class Kernel extends HttpKernel
         // 跨越请求方法
 //        \Illuminate\Http\Middleware\Cors::class,
         \App\Http\Middleware\CorsMiddleware::class,
+        // 响应规范
+        \App\Http\Middleware\ApiResponseMiddleware::class,
     ];
 
     /**
@@ -45,6 +47,8 @@ class Kernel extends HttpKernel
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // 响应规范
+//            \App\Http\Middleware\ApiResponseMiddleware::class,
         ],
     ];
 
@@ -66,6 +70,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        // 检测跨域问题的中间件
         'cors'  =>  \App\Http\Middleware\CorsMiddleware::class,
 //        管理员权限检测中间件
         'jwt.admin' => \App\Http\Middleware\JwtAdminMiddleware::class,

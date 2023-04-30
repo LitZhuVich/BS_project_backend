@@ -12,7 +12,7 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public $timestamps = false;
+//    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -22,7 +22,10 @@ class User extends Authenticatable implements JWTSubject
         'username',
         'password',
     ];
-
+    protected $casts = [
+        'created_at'=>'date:Y-m-d H:i:s',
+        'updated_at'=>'date:Y-m-d H:i:s'
+    ];
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -31,11 +34,17 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'role'
     ];
 
     public function getJWTIdentifier()
     {
         return $this->getKey();
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 
     public function getJWTCustomClaims()
@@ -49,8 +58,19 @@ class User extends Authenticatable implements JWTSubject
 
     public function isAdmin()
     {
-        // '0:普通用户 1:超级管理员'
-        // 如果 权限信息是 1
-        return $this->UserRole === 1;
+        // 权限等于 3 是管理员
+        return $this->role_id === 3;
+    }
+
+    public function isEngineer()
+    {
+        // 权限等于 2 是工程师
+        return $this->role_id === 2;
+    }
+
+    public function isCustomerRepresentative()
+    {
+        // 权限等于 1 == 客户代表
+        return $this->role_id === 1;
     }
 }
