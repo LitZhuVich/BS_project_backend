@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     /**
-     * 登录方法
+     * 注册方法
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -42,10 +42,16 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         // 返回创建成功信息
-        return response()->json(['user'=>$user,'token'=>$token]);
+//        return response()->json(['user'=>$user,'token'=>$token],200);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        ],200);
     }
 
     /**
+     * TODO:待完成
      * 注册，有邮箱验证功能
      *
      * @param Request $request
@@ -73,10 +79,11 @@ class AuthController extends Controller
 
         Mail::to($user->email)->send(new VerifyEmail($user));
 
-        return response()->json(['message' => 'User registered successfully. Please check your email to verify your account.'], 201);
+        return response()->json('用户成功注册。 请检查您的电子邮件以验证您的帐户.', 201);
     }
 
     /**
+     * TODO:待完成
      * 验证邮箱
      *
      * @param $token
@@ -94,7 +101,7 @@ class AuthController extends Controller
         $user->email_verification_token = null;
         $user->save();
 
-        return response()->json(['message' => 'Email verified successfully.'], 200);
+        return response()->json('电子邮件已成功验证', 200);
     }
 
     /**
@@ -109,12 +116,16 @@ class AuthController extends Controller
 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['message' => '账号或密码有误']);
+                return response()->json('账号或密码有误');
             }else{
-                return response()->json(['token' => $token],200);
+                return response()->json([
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],200);
             }
         } catch (JWTException $e) {
-            return response()->json(['message' => '用户名或者密码错误'], 500);
+            return response()->json('用户名或者密码错误', 500);
         }
     }
 
@@ -125,13 +136,24 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        // 获取当前用户的 Token
-        $token = JWTAuth::getToken();
+//        // 获取当前用户的 Token
+//        $token = JWTAuth::getToken();
+//
+//        // 刷新 Token 并返回新的 Token
+//        $newToken = JWTAuth::refresh($token);
+//
+//        return response()->json(['token' => $newToken]);
+        try {
+            $token = JWTAuth::parseToken()->refresh();
+        } catch (JWTException $e) {
+            return response()->json('无法刷新令牌', 500);
+        }
 
-        // 刷新 Token 并返回新的 Token
-        $newToken = JWTAuth::refresh($token);
-
-        return response()->json(['token' => $newToken]);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        ]);
     }
 
     /**
@@ -142,7 +164,7 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return response()->json(['message' => '成功登出']);
+        return response()->json('成功登出');
     }
 
     /**
