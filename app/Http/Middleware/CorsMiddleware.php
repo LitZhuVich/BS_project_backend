@@ -19,7 +19,7 @@ class CorsMiddleware
         $response = $next($request);
 //       允许请求的跨越域名: http://localhost:5173
         $response->header('Access-Control-Allow-Origin', 'http://localhost:5173')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT,PATCH, DELETE, OPTIONS');
 
         return $response;
     }

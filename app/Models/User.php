@@ -20,7 +20,15 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'username',
+        'companyname',
         'password',
+        'avator',
+        'phone',
+        'address',
+        'email',
+        'is_verified',
+        'email_verification_token',
+        'role_id',
     ];
 
     protected $casts = [
@@ -36,6 +44,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
         'role',
+        'pivot',
     ];
 
     public function getJWTIdentifier()
@@ -43,14 +52,18 @@ class User extends Authenticatable implements JWTSubject
         return $this->getKey();
     }
 
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-    public function getJWTCustomClaims()
-    {
-        return [];
+    public function groups(){
+        return $this->belongsToMany(Group::class,'group_users');
     }
 
     public function username(){

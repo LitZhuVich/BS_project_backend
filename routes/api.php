@@ -38,5 +38,11 @@ Route::group(['prefix'=>'/v1'],function (){
         Route::post('/logout',[\App\Http\Controllers\AuthController::class,'logout']);
         // 返回用户信息
         Route::get('/user',[\App\Http\Controllers\AuthController::class,'show']);
+        // 批量删除客户
+        Route::delete('/user',[\App\Http\Controllers\AuthController::class,'destroyMany']);
+        // 删除客户
+        Route::delete('/user/{id}',[\App\Http\Controllers\AuthController::class,'destroy']);
+        // 显示所有客户
+        Route::get('/getAllCustomerRepresentative',[\App\Http\Controllers\AuthController::class,'getAllCustomerRepresentative']);
     });
 })->middleware('cors');
