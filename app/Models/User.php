@@ -8,11 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-//    public $timestamps = false;
+    //    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -20,12 +21,20 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'username',
+        'companyname',
         'password',
+        'avator',
+        'phone',
+        'address',
+        'email',
+        'is_verified',
+        'email_verification_token',
+        'role_id',
     ];
 
     protected $casts = [
-        'created_at'=>'date:Y-m-d H:i:s',
-        'updated_at'=>'date:Y-m-d H:i:s'
+        'created_at' => 'date:Y-m-d H:i:s',
+        'updated_at' => 'date:Y-m-d H:i:s'
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -36,6 +45,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
         'role',
+        'pivot',
     ];
 
     public function getJWTIdentifier()
@@ -43,17 +53,23 @@ class User extends Authenticatable implements JWTSubject
         return $this->getKey();
     }
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
     public function getJWTCustomClaims()
     {
         return [];
     }
 
-    public function username(){
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_users');
+    }
+
+    public function username()
+    {
         return 'username';
     }
 
