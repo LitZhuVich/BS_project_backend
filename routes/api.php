@@ -25,7 +25,6 @@ Route::group(['prefix'=>'/v1'],function (){
     // 登录接口
     Route::post('/login',[\App\Http\Controllers\AuthController::class,'login']);
 
-
     // 测试接口
     Route::get('/asd',function (){
         return '1123';

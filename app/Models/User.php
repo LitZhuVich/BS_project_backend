@@ -22,6 +22,7 @@ class User extends Authenticatable implements JWTSubject
         'username',
         'password',
     ];
+
     protected $casts = [
         'created_at'=>'date:Y-m-d H:i:s',
         'updated_at'=>'date:Y-m-d H:i:s'
@@ -34,7 +35,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
-        'role'
+        'role',
     ];
 
     public function getJWTIdentifier()

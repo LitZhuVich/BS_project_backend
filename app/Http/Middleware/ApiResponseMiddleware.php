@@ -19,6 +19,7 @@ class ApiResponseMiddleware
         /** @var LaravelResponse */
         $response = $next($request);
         $data = '';
+
         // 根据响应状态码设置不同的消息内容
         switch ($response->status()) {
             case 200:

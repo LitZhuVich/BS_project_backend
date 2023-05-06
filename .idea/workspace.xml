@@ -7,10 +7,9 @@
     <list default="true" id="540fab92-15f5-48ac-bccf-6743d479ee32" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AuthController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Kernel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/ApiResponseMiddleware.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/ApiResponseMiddleware.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/jwt.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/jwt.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/auth.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -196,7 +195,10 @@
       <workItem from="1680923983965" duration="235000" />
       <workItem from="1680924259519" duration="3452000" />
       <workItem from="1681919034605" duration="1786000" />
-      <workItem from="1682769957839" duration="21724000" />
+      <workItem from="1682769957839" duration="22389000" />
+      <workItem from="1683026405677" duration="1893000" />
+      <workItem from="1683051432885" duration="2731000" />
+      <workItem from="1683160409179" duration="1840000" />
     </task>
     <servers />
   </component>
