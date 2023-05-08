@@ -12,7 +12,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-//    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -29,12 +28,14 @@ class User extends Authenticatable implements JWTSubject
         'is_verified',
         'email_verification_token',
         'role_id',
+        'remark',
     ];
 
     protected $casts = [
         'created_at'=>'date:Y-m-d H:i:s',
         'updated_at'=>'date:Y-m-d H:i:s'
     ];
+
     /**
      * The attributes that should be hidden for serialization.
      *

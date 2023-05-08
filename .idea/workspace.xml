@@ -7,8 +7,9 @@
     <list default="true" id="540fab92-15f5-48ac-bccf-6743d479ee32" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AuthController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/CorsMiddleware.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/CorsMiddleware.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/auth.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -202,6 +203,13 @@
       <workItem from="1683211636586" duration="677000" />
       <workItem from="1683248570721" duration="9727000" />
       <workItem from="1683332917326" duration="6629000" />
+      <workItem from="1683340400922" duration="260000" />
+      <workItem from="1683343983118" duration="1200000" />
+      <workItem from="1683366210943" duration="1993000" />
+      <workItem from="1683459943015" duration="6763000" />
+      <workItem from="1683474126400" duration="347000" />
+      <workItem from="1683505083585" duration="4841000" />
+      <workItem from="1683553961762" duration="1930000" />
     </task>
     <servers />
   </component>

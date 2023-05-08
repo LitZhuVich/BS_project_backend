@@ -39,10 +39,18 @@ Route::group(['prefix'=>'/v1'],function (){
         // 返回用户信息
         Route::get('/user',[\App\Http\Controllers\AuthController::class,'show']);
         // 批量删除客户
-        Route::delete('/user',[\App\Http\Controllers\AuthController::class,'destroyMany']);
+        Route::delete('/CustomerRepresentative',[\App\Http\Controllers\UserController::class,'destroyMany']);
         // 删除客户
-        Route::delete('/user/{id}',[\App\Http\Controllers\AuthController::class,'destroy']);
+        Route::delete('/CustomerRepresentative/{id}',[\App\Http\Controllers\UserController::class,'destroy']);
         // 显示所有客户
-        Route::get('/getAllCustomerRepresentative',[\App\Http\Controllers\AuthController::class,'getAllCustomerRepresentative']);
+        Route::get('/getAllCustomerRepresentative',[\App\Http\Controllers\UserController::class,'getAllCustomerRepresentative']);
+        // 显示筛选客户表单数据
+        Route::post('/filterCustomerRepresentative',[\App\Http\Controllers\UserController::class,'filterCustomerRepresentative']);
+
+        // 显示所有工单状态
+        Route::get('/orderType',[\App\Http\Controllers\OrderTypeController::class,'index']);
+
+        // 显示所有组的名字
+        Route::get('/groupName',[\App\Http\Controllers\GroupController::class,'showGroupName']);
     });
 })->middleware('cors');
