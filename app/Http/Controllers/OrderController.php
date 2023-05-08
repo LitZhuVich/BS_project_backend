@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Order;
 
 class OrderController extends Controller
 {
@@ -21,9 +22,21 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        // 验证请求数据
+        $validatedData = $request->validate([
+            'title' => 'required|string',
+        ]);
+
+        // 判断是否为POST提交
+        $result = Order::create([
+            'title' => $validatedData['title']
+        ]);
+
+        return response()->json($result, 200); // 返回结果
+
+        // return $request->all();
     }
 
     /**

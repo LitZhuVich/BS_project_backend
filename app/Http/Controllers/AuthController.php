@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+
     /**
      * 注册方法
      *
@@ -26,18 +27,18 @@ class AuthController extends Controller
             'username' => 'required|string|unique:users|max:255',
             'password' => 'required|string|confirmed',
         ]);
-//        当您使用 confirmed 规则时，Laravel 会自动检查与被验证字段名称相同，但后缀为 _confirmation 的字段。例如，如果您想验证 password 字段
-//          ，Laravel 会自动检查 password_confirmation 字段
+        //        当您使用 confirmed 规则时，Laravel 会自动检查与被验证字段名称相同，但后缀为 _confirmation 的字段。例如，如果您想验证 password 字段
+        //          ，Laravel 会自动检查 password_confirmation 字段
         // 验证失败
         if ($validator->fails()) {
-            return response()->json($validator->errors(),400);
+            return response()->json($validator->errors(), 400);
         }
         // 添加用户
         // 使用 Argon2 哈希算法加密密码 memory 参数定义了哈希需要使用的内存大小，time 参数定义了哈希需要执行的时间，threads 参数定义了哈希算法需要使用的线程数。
         $user = User::create([
             'username'      => $request->username,
-            'password'      => Hash::make($request->password,['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
-//            TODO:后期需要修改，现在不允许为空
+            'password'      => Hash::make($request->password, ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
+            //            TODO:后期需要修改，现在不允许为空
             'companyname'   => ''
         ]);
 
@@ -45,12 +46,12 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         // 返回创建成功信息
-//        return response()->json(['user'=>$user,'token'=>$token],200);
+        //        return response()->json(['user'=>$user,'token'=>$token],200);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
-        ],200);
+        ], 200);
     }
 
     /**
@@ -113,19 +114,20 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         // 获取用户名和密码
         $credentials = $request->only('username', 'password');
 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json('账号或密码有误');
-            }else{
+            } else {
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60,
-                ],200);
+                ], 200);
             }
         } catch (JWTException $e) {
             return response()->json('用户名或者密码错误', 500);
@@ -139,13 +141,13 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-//        // 获取当前用户的 Token
-//        $token = JWTAuth::getToken();
-//
-//        // 刷新 Token 并返回新的 Token
-//        $newToken = JWTAuth::refresh($token);
-//
-//        return response()->json(['token' => $newToken]);
+        //        // 获取当前用户的 Token
+        //        $token = JWTAuth::getToken();
+        //
+        //        // 刷新 Token 并返回新的 Token
+        //        $newToken = JWTAuth::refresh($token);
+        //
+        //        return response()->json(['token' => $newToken]);
         try {
             $token = JWTAuth::parseToken()->refresh();
         } catch (JWTException $e) {
@@ -167,7 +169,7 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return response()->json('成功登出',200);
+        return response()->json('成功登出', 200);
     }
 
     /**
@@ -175,12 +177,13 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function show(){
+    public function show()
+    {
         $user = JWTAuth::parseToken()->authenticate();
         $user->load('role');
         $role = $user->role;
         $user->setAttribute('role_name', $role->role_name);
         // 返回用户信息`
-        return response()->json($user,200);
+        return response()->json($user, 200);
     }
 }

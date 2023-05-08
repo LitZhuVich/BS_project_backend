@@ -8,10 +8,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+<<<<<<< HEAD
+=======
+    //    public $timestamps = false;
+>>>>>>> e66bc59ebd26b6777866bc8a0a1a6525a8641c35
     /**
      * The attributes that are mass assignable.
      *
@@ -32,8 +37,8 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $casts = [
-        'created_at'=>'date:Y-m-d H:i:s',
-        'updated_at'=>'date:Y-m-d H:i:s'
+        'created_at' => 'date:Y-m-d H:i:s',
+        'updated_at' => 'date:Y-m-d H:i:s'
     ];
 
     /**
@@ -63,11 +68,13 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
-    public function groups(){
-        return $this->belongsToMany(Group::class,'group_users');
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_users');
     }
 
-    public function username(){
+    public function username()
+    {
         return 'username';
     }
 

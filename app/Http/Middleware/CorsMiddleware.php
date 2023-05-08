@@ -17,9 +17,10 @@ class CorsMiddleware
     public function handle(Request $request, Closure $next)
     {
         $response = $next($request);
-//       允许请求的跨越域名: http://localhost:5173
-        $response->header('Access-Control-Allow-Origin', 'http://localhost:5173')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT,PATCH, DELETE, OPTIONS');
+        //       允许请求的跨越域名: http://localhost:5173  
+        // 现阶段先全部 *
+        $response->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
         return $response;
     }
