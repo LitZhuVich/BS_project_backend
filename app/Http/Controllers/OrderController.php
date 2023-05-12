@@ -4,26 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\OrderPrioritie;
 use Exception;
 
 class OrderController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * 获取全部订单数据
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        return Order::get();
     }
 
     /**
-     * Show the form for creating a new resource.
+     * 创建工单
      *
      * @return \Illuminate\Http\Response
      */
-    // 创建工单
     public function create(Request $request)
     {
         try {
@@ -66,14 +66,18 @@ class OrderController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * 获取全部订单数据
      */
-    public function show($id)
+    public function getOrder($id)
     {
-        //
+        $data = Order::get();
+        $priority_id = OrderPrioritie::query()->find($id);
+        if (!$priority_id) {
+            return response()->json('优先值获取失败', 400);
+        }
+        $priority = response()->json($priority_id->priority_name, 200);
+
+        return $data;
     }
 
     /**
