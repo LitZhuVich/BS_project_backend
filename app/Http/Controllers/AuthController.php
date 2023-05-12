@@ -15,28 +15,6 @@ class AuthController extends Controller
 {
 
     /**
-     * 显示所有客户信息
-     *
-     * @return void
-     */
-    public function getAllCustomerRepresentative()
-    {
-        $user = User::with('groups')->withCount('groups')->where('role_id', 1)->get();
-        return response()->json($user, 200);
-
-        // 这是根据 组 显示 客户
-        //        $group = Group::with('users')->withCount('users')->get();
-        //
-        //        return $group->map(function ($group){
-        //            return [
-        //                'group'=>$group->group_name,
-        //                'user_count'=>$group->users_count,
-        //                'users'=>$group->users->toArray(),
-        //            ];
-        //        });
-    }
-
-    /**
      * 注册方法
      *
      * @param Request $request
@@ -207,40 +185,5 @@ class AuthController extends Controller
         $user->setAttribute('role_name', $role->role_name);
         // 返回用户信息`
         return response()->json($user, 200);
-    }
-
-    /**
-     * 删除客户,需要管理员权限
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id)
-    {
-        $user = User::find($id)->delete();
-        if ($user != 1) {
-            return response()->json('删除失败', 400);
-        }
-
-        return response()->json('删除成功', 200);
-    }
-
-    /**
-     * 批量删除客户,需要管理员权限
-     *
-     * @param  Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroyMany(Request $request)
-    {
-        // 验证请求数据
-        $validatedData = $request->validate([
-            'ids' => 'required|integer',
-        ]);
-
-        // 删除用户
-        User::whereIn('id', $validatedData['ids'])->delete();
-
-        return response()->json('成功批量删除', 200);
     }
 }

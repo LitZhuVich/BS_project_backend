@@ -115,6 +115,6 @@ return [
     /***
      * refresh_ttl 表示刷新 token 的有效期，单位为分钟；refresh_tti 表示刷新 token 的间隔时间，单位为分钟。
      */
-    'refresh_ttl' => env('JWT_REFRESH_TTL', 20160),
-    'refresh_tti' => env('JWT_REFRESH_TTI', 43200),
+    'refresh_ttl' => env('JWT_REFRESH_TTL', 14400),
+    'refresh_tti' => env('JWT_REFRESH_TTI', 7700),
 ];
