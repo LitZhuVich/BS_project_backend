@@ -174,6 +174,7 @@ class AuthController extends Controller
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
+
             $user->load('role');
             $role = $user->role;
             $user->setAttribute('role_name', $role->role_name);
