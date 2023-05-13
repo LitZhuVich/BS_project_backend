@@ -58,7 +58,6 @@ class GroupController extends Controller
         }catch (JWTException $e){
             return response()->json($e,200);
         }
-        //
     }
     // TODO:需修改
     public function showMany(Request $request){

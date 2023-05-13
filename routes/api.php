@@ -53,15 +53,26 @@ Route::group(['prefix' => '/v1'], function () {
         // 显示筛选客户表单数据
         Route::post('/filterCustomerRepresentative',[\App\Http\Controllers\UserController::class,'showMany']);
         // 显示所有工单状态
-        Route::get('/orderType',[\App\Http\Controllers\OrderTypeController::class,'index']);
+//        Route::get('/orderType',[\App\Http\Controllers\OrderTypeController::class,'index']);
         // 显示所有组的名字
         Route::get('/groupName',[\App\Http\Controllers\GroupController::class,'showGroupName']);
-        Route::get('/group',[\App\Http\Controllers\GroupController::class,'show']);
+        Route::get('/group/{id}',[\App\Http\Controllers\GroupController::class,'show']);
         Route::post('/group',[\App\Http\Controllers\GroupController::class,'showMany']);
         /*
             工单
         */
+        // 获取全部工单
+        Route::get('/order', [\App\Http\Controllers\OrderController::class, 'index']);
         // 发布工单
         Route::post('/order', [\App\Http\Controllers\OrderController::class, 'create']);
+        // 根据工单预约时间月份搜索
+        Route::post('/getOrderByMonth', [\App\Http\Controllers\OrderController::class, 'getOrdersByMonth']);
+
+        Route::get('/asdsad/{id}', [\App\Http\Controllers\OrderController::class, 'getOrder']);
+        /*
+            工单类型
+        */
+        // 查询工单类型
+        Route::get('/orderType', [\App\Http\Controllers\OrderTypeController::class, 'index']);
     });
 })->middleware('cors');

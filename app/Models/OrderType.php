@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class OrderType extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'id',
+        'type_name'
+    ];
+
+    protected $hidden = [
+        'type_description'
+    ];
 }

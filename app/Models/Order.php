@@ -12,6 +12,17 @@ class Order extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'title'
+        'priority_id',
+        'status_id',
+        'type_id',
+        'user_id',
+        'phone',
+        'title',
+        'time_limit',
+        'description',
+        'attachment',
+        'isOnLine',
+        'address',
+        'appointment'
     ];
 }
