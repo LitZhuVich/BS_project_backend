@@ -33,20 +33,26 @@ class UserController extends Controller
         // 将传入的 AuthController 实例保存到 $authController 中
         $this->authController = $authController;
     }
+
     /**
-     * 显示所有客户信息
+     * 分页显示所有客户信息
+     * 使用类似： '/CustomerRepresentative?pageSize=10' 方式调用
      *
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-
-        $user = User::with('groups')->withCount('groups')->where('role_id',1)->get();
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $user = User::query()->with('groups')->withCount('groups')->where('role_id',1)
+            ->paginate($page_size);
         if (!$user){
             return response()->json('获取失败',400);
         }
         return response()->json($user,200);
-
     }
 
     /**
@@ -55,19 +61,21 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function showMany(Request $request)
+    public function showFilter(Request $request)
     {
         try {
+            // 页面数据大小
+            $page_size = $request->input('pageSize');
             // 接收要查询的数据内容
             $searchValue = $request->input('searchValue');
             // 接收要查询的数据类型
             $searchType = $request->input('searchType');
-
-            $allowedFields = ['companyname', 'username', 'phone'];
             // 如果 $searchType 不在 $allowedFields 中，则默认为 'companyname'
+            $allowedFields = ['companyname', 'username', 'phone'];
             $field = in_array($searchType, $allowedFields) ? $searchType : 'companyname';
             // 使用模糊查询获取数据
-            $filteredData = User::where($field,'like',"%$searchValue%")->where('role_id',1)->with('groups')->withCount('groups')->get();
+            $filteredData = User::query()->where($field,'like',"%$searchValue%")->where('role_id',1)
+                ->with('groups')->withCount('groups')->paginate($page_size);
             return response()->json($filteredData,200);
         }catch (JWTException $e){
             return response()->json('获取失败'.$e,400);
@@ -128,8 +136,6 @@ class UserController extends Controller
         ]);
 
         try {
-//            $operator = JWTAuth::parseToken()->authenticate();
-
             // 开始进行事务
             DB::beginTransaction();
             // 创建用户并加密密码,在客户管理页面新建的客户密码默认：asd123456
@@ -172,9 +178,9 @@ class UserController extends Controller
             'address'       => ['nullable'],
             'remark'        => ['nullable'],
             'phone'         => ['nullable', 'integer', 'digits:11'],
-            'group_name'    => ['nullable', 'array']
+            'group_name'    => ['nullable', 'array'],
+            'is_locked'     => ['nullable']
         ]);
-
         try {
             // 开始进行事务
             DB::beginTransaction();
@@ -185,10 +191,10 @@ class UserController extends Controller
                 'address'       =>  $validatedData['address'] ?? "",
                 'remark'        =>  $validatedData['remark'] ?? "",
                 'phone'         =>  $validatedData['phone'] ?? "",
+                'is_locked'     =>  $validatedData['is_locked']
             ]);
             // 保存刷新
             $user->saveOrFail();
-
             // 更新用户组
             $groupNames = $validatedData['group_name'] ?? [];
             $groups = Group::whereIn('group_name', $groupNames)->get(['id', 'group_name']);
@@ -197,11 +203,21 @@ class UserController extends Controller
             $user->groups()->sync($groupIds);
             // 提交事务，如果事务已成功执行，则将更改提交到数据库。
             DB::commit();
+            return response()->json($user, 200);
             return response()->json('更新成功', 200);
         } catch (\Throwable $e) {
             // 回滚刚才的数据库操作
             DB::rollBack();
             return response()->json('更新失败：' . $e->getMessage(), 500);
         }
+    }
+
+    /**
+     * 禁用和启用客户
+     *
+     * @return void
+     */
+    public function lock(){
+
     }
 }
