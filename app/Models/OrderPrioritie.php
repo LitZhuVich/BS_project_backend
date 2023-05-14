@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class OrderPrioritie extends Model
 {
     use HasFactory;
+
+    protected $hidden = ['id'];
+
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
 }

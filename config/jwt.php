@@ -121,7 +121,7 @@ return [
     */
 
 // 表示token的可刷新时间 一天
-    'refresh_ttl' => env('JWT_REFRESH_TTL', 1440),
+    'refresh_ttl' => env('JWT_REFRESH_TTL', 10080),
 
     /*
     |--------------------------------------------------------------------------

@@ -6,6 +6,7 @@ use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Models\User;
@@ -46,7 +47,6 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         // 返回创建成功信息
-        //        return response()->json(['user'=>$user,'token'=>$token],200);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -82,7 +82,6 @@ class AuthController extends Controller
         ]);
 
         Mail::to($user->email)->send(new VerifyEmail($user));
-
         return response()->json('用户成功注册。 请检查您的电子邮件以验证您的帐户.', 201);
     }
 
@@ -93,7 +92,7 @@ class AuthController extends Controller
      * @param $token
      * @return \Illuminate\Http\JsonResponse
      */
-    public function verifyEmail($token)
+    public function VerifyEmail(string $token)
     {
         $user = User::where('email_verification_token', $token)->first();
 
@@ -136,29 +135,23 @@ class AuthController extends Controller
 
     /**
      * 刷新 token
+     * 会让之前的 token 失效
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh()
+    public function refreshToken()
     {
-        //        // 获取当前用户的 Token
-        //        $token = JWTAuth::getToken();
-        //
-        //        // 刷新 Token 并返回新的 Token
-        //        $newToken = JWTAuth::refresh($token);
-        //
-        //        return response()->json(['token' => $newToken]);
         try {
             $token = JWTAuth::parseToken()->refresh();
         } catch (JWTException $e) {
-            return response()->json('无法刷新令牌', 500);
+            return response()->json('无法刷新令牌', 401);
         }
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
-        ]);
+        ], 200);
     }
 
     /**
@@ -179,11 +172,19 @@ class AuthController extends Controller
      */
     public function show()
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $user->load('role');
-        $role = $user->role;
-        $user->setAttribute('role_name', $role->role_name);
-        // 返回用户信息`
-        return response()->json($user, 200);
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            $user->load('role');
+            $role = $user->role;
+            $user->setAttribute('role_name', $role->role_name);
+            // 返回用户信息
+            if (!$user) {
+                return response()->json('用户未登录', 401);
+            }
+
+            return response()->json($user, 200);
+        } catch (JWTException $e) {
+            return response()->json($e, 401);
+        }
     }
 }

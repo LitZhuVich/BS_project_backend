@@ -13,7 +13,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -63,6 +62,11 @@ class User extends Authenticatable implements JWTSubject
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function order()
+    {
+        return $this->hasOne(Order::class);
     }
 
     public function groups()

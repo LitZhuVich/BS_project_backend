@@ -18,6 +18,7 @@ class Group extends Model
     protected $hidden = [
         'pivot'
     ];
+    
     public function users()
     {
         return $this->belongsToMany(User::class, 'group_users');
