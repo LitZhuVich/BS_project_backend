@@ -22,6 +22,12 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => '/v1'], function () {
     // 注册接口
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
+    // 验证邮箱验证码接口
+    Route::post('/verifyEmail/{token}', [\App\Http\Controllers\AuthController::class, 'verifyEmail']);
+//    $token
+//    Route::post('/registerCheckEmail', [\App\Http\Controllers\AuthController::class, 'registerCheckEmail']);
+//    发送邮箱令牌
+    Route::post('/sendEmailToken', [\App\Http\Controllers\AuthController::class, 'sendEmailToken']);
     // 登录接口
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
     // 测试接口
