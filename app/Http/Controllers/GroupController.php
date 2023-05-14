@@ -50,7 +50,7 @@ class GroupController extends Controller
     public function show($id)
     {
         try {
-            $group = Group::find($id);
+            $group = Group::where('id',$id)->with('users')->withCount('users')->first();
             if (!$group){
                 return response()->json('没有组',400);
             }
@@ -59,14 +59,46 @@ class GroupController extends Controller
             return response()->json($e,200);
         }
     }
-    // TODO:需修改
-    public function showMany(Request $request){
+
+    /**
+     * 获取所有组信息
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showUser(){
+        $group = Group::with('users')->withCount('users')->get();
+
+        if (!$group){
+            return response()->json('获取失败',400);
+        }
+
+        return response()->json($group->map(function ($group){
+            return [
+                'group'=>$group->group_name,
+                'user_count'=>$group->users_count,
+                'users'=>$group->users->toArray(),
+            ];
+        }));
+    }
+
+    /**
+     * 获取所有
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showName(int $id){
         try {
-            $user_id = $request->ids;
-            $user = User::query()->where('id',$user_id)->get();
-//            $group = Group::query()->whereIn('id',$group_id)->get();
-            return $user;
-            return response()->json($group,200);
+            $user = User::query()->where('id',$id)->with('groups')->first();
+            if (!$user){
+                return response()->json('没有用户',400);
+            }
+            // 只取组名
+            $groups = $user->groups->map(function ($a){
+                return $a->group_name;
+            });
+
+            return response()->json($groups,200);
         }catch (JWTException $e){
             return response()->json($e,200);
         }

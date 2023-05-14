@@ -70,8 +70,9 @@ return [
     */
 
 //    'timezone' => 'UTC',
-    'timezone' => env('APP_TIMEZONE','UTC'),
+//    'timezone' => env('APP_TIMEZONE','UTC'),
 //    'timezone' => 'Asia/Shanghai',
+    'timezone' => 'Asia/Shanghai',
 
     /*
     |--------------------------------------------------------------------------

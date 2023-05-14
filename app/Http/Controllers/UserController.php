@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\GroupUser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Http\Controllers\AuthController;
@@ -81,7 +82,7 @@ class UserController extends Controller
     public function show(int $id)
     {
         try {
-            $user = User::query()->where('id', $id)->first();
+            $user = User::query()->where('id', $id)->with('groups')->withCount('groups')->first();
             if (!$user) {
                 return response()->json('获取失败，该用户不存在', 400);
             }
@@ -108,31 +109,11 @@ class UserController extends Controller
     }
 
     /**
-     * 批量删除客户,需要管理员权限
-     *
-     * @param  Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroyMany(Request $request)
-    {
-        // 验证请求数据
-        $validatedData = $request->validate([
-            'ids' => ['required', 'array'],
-        ]);
-        // 删除用户
-        $user = User::whereIn('id', $validatedData['ids'])->delete();
-        if ($user != 1 && $user->isAdmin()) {
-            return response()->json('删除失败', 400);
-        }
-        return response()->json('成功批量删除', 200);
-    }
-
-    /**
      * 新增客户信息
-     * 通过客户管理页面新增的客户密码默认是123456
+     * 通过客户管理页面新增的客户密码默认是asd123456
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -140,33 +121,47 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'companyname'   => ['required', 'unique:users', 'max:255'],
             'username'      => ['required', 'max:255'],
-            'address'       => 'nullable',
-            'remark'        => 'nullable',
+            'address'       => ['nullable'],
+            'remark'        => ['nullable'],
             'phone'         => ['nullable', 'integer', 'digits:11'],
             'group_name'    => ['nullable', 'array']
         ]);
-        // 在客户管理页面新建的客户密码默认：asd123456
-        $user = User::create([
-            'companyname'   =>  $validatedData['companyname'],
-            'username'      =>  $validatedData['username'],
-            'password'      =>  Hash::make('asd123456', ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
-            'address'       =>  $validatedData['address'] ?? "",
-            'remark'        =>  $validatedData['remark'] ?? "",
-            'phone'         =>  $validatedData['phone'] ?? "",
-        ]);
-        if (!$user) {
-            return response()->json('创建失败', 500);
-        }
 
-        return response()->json('创建成功', 200);
+        try {
+            //            $operator = JWTAuth::parseToken()->authenticate();
+
+            // 开始进行事务
+            DB::beginTransaction();
+            // 创建用户并加密密码,在客户管理页面新建的客户密码默认：asd123456
+            $user = User::create([
+                'companyname'   =>  $validatedData['companyname'],
+                'username'      =>  $validatedData['username'] ?? "1232131231321sda",
+                'password'      =>  Hash::make('asd123456', ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
+                'address'       =>  $validatedData['address'] ?? "",
+                'remark'        =>  $validatedData['remark'] ?? "",
+                'phone'         =>  $validatedData['phone'] ?? "",
+            ]);
+
+            if (!$user) {
+                throw new \Exception('创建失败');
+            }
+            // 提交事务，如果事务已成功执行，则将更改提交到数据库。
+            DB::commit();
+            return response()->json('创建成功', 200);
+        } catch (\Throwable $e) {
+            // 回滚刚才的数据库操作
+            DB::rollBack();
+            logger()->error('创建用户数据保存时发生错误：' . $e->getMessage());
+            return response()->json('创建失败', 403);
+        }
     }
 
     /**
-     * 修改客户信息，需要管理员权限
+     * 修改客户信息
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request  $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, int $id)
     {
@@ -174,34 +169,39 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'companyname'   => ['required', 'max:255'],
             'username'      => ['required', 'max:255'],
-            'address'       => 'nullable',
-            'remark'        => 'nullable',
+            'address'       => ['nullable'],
+            'remark'        => ['nullable'],
             'phone'         => ['nullable', 'integer', 'digits:11'],
             'group_name'    => ['nullable', 'array']
         ]);
 
-        $userInfo = User::where('id', $id)->first();
-        //         获取组
-        $group_name = $validatedData['group_name'] ?? [];
-        Group::query()->whereIn('group_name', $group_name)->get()->map(function ($group) use ($userInfo) {
-            GroupUser::create([
-                'group_id'  =>  $group->id,
-                'user_id'   =>  $userInfo->id
+        try {
+            // 开始进行事务
+            DB::beginTransaction();
+            // 获取用户信息并更新
+            $user = User::findOrFail($id)->fill([
+                'companyname'   =>  $validatedData['companyname'],
+                'username'      =>  $validatedData['username'],
+                'address'       =>  $validatedData['address'] ?? "",
+                'remark'        =>  $validatedData['remark'] ?? "",
+                'phone'         =>  $validatedData['phone'] ?? "",
             ]);
-        });
+            // 保存刷新
+            $user->saveOrFail();
 
-        $user = $userInfo->update([
-            'companyname'   =>  $validatedData['companyname'],
-            'username'      =>  $validatedData['username'],
-            'address'       =>  $validatedData['address'] ?? "",
-            'remark'        =>  $validatedData['remark'] ?? "",
-            'phone'         =>  $validatedData['phone'] ?? "",
-        ]);
+            // 更新用户组
+            $groupNames = $validatedData['group_name'] ?? [];
+            $groups = Group::whereIn('group_name', $groupNames)->get(['id', 'group_name']);
+            $groupIds = $groups->pluck('id')->toArray();
 
-        if (!$user) {
-            return response()->json('创建失败', 500);
+            $user->groups()->sync($groupIds);
+            // 提交事务，如果事务已成功执行，则将更改提交到数据库。
+            DB::commit();
+            return response()->json('更新成功', 200);
+        } catch (\Throwable $e) {
+            // 回滚刚才的数据库操作
+            DB::rollBack();
+            return response()->json('更新失败：' . $e->getMessage(), 500);
         }
-
-        return response()->json('创建成功', 200);
     }
 }
