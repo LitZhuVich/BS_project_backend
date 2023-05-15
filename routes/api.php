@@ -80,8 +80,6 @@ Route::group(['prefix' => '/v1'], function () {
         Route::post('/order', [\App\Http\Controllers\OrderController::class, 'create']);
         // 根据工单预约时间月份搜索
         Route::post('/getOrderByMonth', [\App\Http\Controllers\OrderController::class, 'getOrdersByMonth']);
-
-        Route::get('/getOrderDetail', [\App\Http\Controllers\OrderController::class, 'getOrder']);
         /*
             工单类型
         */

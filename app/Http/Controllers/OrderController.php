@@ -15,7 +15,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return Order::get();
+        $data = Order::all();
+        return response()->json($data, 200);
     }
 
     /**
@@ -51,15 +52,6 @@ class OrderController extends Controller
         } catch (JWTException $e) {
             return '失败' . $e;
         }
-    }
-
-    /**
-     * 获取全部订单数据
-     */
-    public function getOrder()
-    {
-        $data = Order::all();
-        return response()->json($data, 200);
     }
 
     /**
