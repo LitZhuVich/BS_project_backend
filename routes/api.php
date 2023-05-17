@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => '/v1'], function () {
     // 注册接口
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
-//    Route::post('/registerCheckEmail', [\App\Http\Controllers\AuthController::class, 'registerCheckEmail']);
+    //    Route::post('/registerCheckEmail', [\App\Http\Controllers\AuthController::class, 'registerCheckEmail']);
     // 登录接口
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
     // 测试接口
@@ -35,7 +35,7 @@ Route::group(['prefix' => '/v1'], function () {
      * 没有登录无法访问
      */
     Route::middleware(['auth:api', 'jwt.auth'])->group(function () {
-//     Route::middleware(['checkLogin'])->group(function () {
+        //     Route::middleware(['checkLogin'])->group(function () {
         // 登出
         Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
         // 返回用户信息
@@ -45,10 +45,10 @@ Route::group(['prefix' => '/v1'], function () {
         // 验证邮箱验证码接口
         Route::post('/verifyEmail', [\App\Http\Controllers\AuthController::class, 'verifyEmail']);
         // TODO:
-//            前缀 : /CustomerRepresentative
-//            例如：
-//            Route::delete('/CustomerRepresentative/{id}',[\App\Http\Controllers\UserController::class,'destroy']);
-//            Route::post('/CustomerRepresentative/filter',[\App\Http\Controllers\UserController::class,'showMany']);
+        //            前缀 : /CustomerRepresentative
+        //            例如：
+        //            Route::delete('/CustomerRepresentative/{id}',[\App\Http\Controllers\UserController::class,'destroy']);
+        //            Route::post('/CustomerRepresentative/filter',[\App\Http\Controllers\UserController::class,'showMany']);
 
         // 客户分类
         Route::group(['prefix' => '/CustomerRepresentative'], function () {
@@ -57,18 +57,17 @@ Route::group(['prefix' => '/v1'], function () {
             // 新增客户信息
             Route::post('/', [\App\Http\Controllers\UserController::class, 'store']);
             // 修改客户信息
-            Route::patch('/{id}', [\App\Http\Controllers\UserController::class,'update']);
+            Route::patch('/{id}', [\App\Http\Controllers\UserController::class, 'update']);
             // 禁用用户/启用用户
-//            Route::patch('/lock/{id}',[\App\Http\Controllers\UserController::class,'update']);
+            //            Route::patch('/lock/{id}',[\App\Http\Controllers\UserController::class,'update']);
             // 显示分页客户数据
-            Route::get('/',[\App\Http\Controllers\UserController::class,'paginate']);
+            Route::get('/', [\App\Http\Controllers\UserController::class, 'paginate']);
             // 显示所有客户
-            Route::get('/all',[\App\Http\Controllers\UserController::class,'index']);
+            Route::get('/all', [\App\Http\Controllers\UserController::class, 'index']);
             // 根据ID获取客户信息
-            Route::get('/{id}',[\App\Http\Controllers\UserController::class,'show']);
+            Route::get('/{id}', [\App\Http\Controllers\UserController::class, 'show']);
             // 显示筛选客户表单数据
-            Route::post('/filter',[\App\Http\Controllers\UserController::class,'showFilter']);
-
+            Route::post('/filter', [\App\Http\Controllers\UserController::class, 'showFilter']);
         });
         // 组分类
         Route::group(['prefix' => '/group'], function () {
@@ -87,6 +86,8 @@ Route::group(['prefix' => '/v1'], function () {
         */
         // 获取全部工单
         Route::get('/order', [\App\Http\Controllers\OrderController::class, 'index']);
+        // 分页显示工单
+        Route::get('/orderPage', [\App\Http\Controllers\OrderController::class, 'paginate']);
         // 发布工单
         Route::post('/order', [\App\Http\Controllers\OrderController::class, 'create']);
         // 根据工单预约时间月份搜索

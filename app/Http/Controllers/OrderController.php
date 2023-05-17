@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderPrioritie;
-use Exception;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -22,8 +20,28 @@ class OrderController extends Controller
     }
 
     /**
+     * 分页显示所有订单信息
+     * 使用类似： '/Order?pageSize=10' 方式调用
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function paginate(Request $request)
+    {
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $order = Order::query()->paginate($page_size);
+        if (!$order) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($order, 200);
+    }
+
+    /**
      * 创建工单
-     *  TODO: 写法需要优化
+     *
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
