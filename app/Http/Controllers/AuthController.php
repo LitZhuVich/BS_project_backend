@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AuthPost;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -22,7 +22,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register1(Request $request)
+    public function register(Request $request)
     {
         // 表单验证
         $validator = Validator::make($request->all(), [
@@ -36,7 +36,7 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
         // 添加用户 输入邮箱令牌
-        // 使用 Argon2 哈希算法加密密码 memory 参数定义了哈希需要使用的内存大小，time 参数定义了哈希需要执行的时间，threads 参数定义了哈希算法需要使用的线程数。
+        // 使用 Argon2 哈希算法加密密码 memory 参数定义了哈希    需要使用的内存大小，time 参数定义了哈希需要执行的时间，threads 参数定义了哈希算法需要使用的线程数。
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
@@ -53,6 +53,7 @@ class AuthController extends Controller
         // 返回创建成功信息
         return response()->json([
             'access_token' => $token,
+            'refresh_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         ], 200);
@@ -68,7 +69,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
 //            'email' => 'required|string|unique:users|max:255|email:filter',
-            'email' => 'required|string|max:255|email:filter',
+//            'email' => 'required|string|max:255|email:filter',
             'user_id' => 'required|integer',
         ]);
         if ($validator->fails()) {
@@ -87,12 +88,12 @@ class AuthController extends Controller
     /**
      * 验证邮箱
      *
-     * @param $token
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function verifyEmail(string $token)
+    public function verifyEmail(Request $request)
     {
-        $user = User::where('email_verification_token', $token)->first();
+        $user = User::where('email_verification_token', $request->input('token'))->first();
 
         if (!$user) {
             return response()->json('令牌输入有误', 400);
@@ -164,7 +165,8 @@ class AuthController extends Controller
     }
 
     /**
-     * 解析JWT令牌 显示已登录的用户
+     * 显示已登录的用户
+     * 解析JWT令牌
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */

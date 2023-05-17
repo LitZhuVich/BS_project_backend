@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,29 +21,29 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => '/v1'], function () {
     // 注册接口
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
-    // 验证邮箱验证码接口
-    Route::post('/verifyEmail/{token}', [\App\Http\Controllers\AuthController::class, 'verifyEmail']);
-//    $token
 //    Route::post('/registerCheckEmail', [\App\Http\Controllers\AuthController::class, 'registerCheckEmail']);
-//    发送邮箱令牌
-    Route::post('/sendEmailToken', [\App\Http\Controllers\AuthController::class, 'sendEmailToken']);
     // 登录接口
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
     // 测试接口
     Route::get('/asd', function () {
         return '1123';
     });
+    // 刷新用户的token
+    Route::get('/refresh', [\App\Http\Controllers\AuthController::class, 'refreshToken']);
     /**
      * 受保护的  Api 接口
      * 没有登录无法访问
      */
     Route::middleware(['auth:api', 'jwt.auth'])->group(function () {
+//     Route::middleware(['checkLogin'])->group(function () {
         // 登出
         Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
         // 返回用户信息
         Route::get('/user', [\App\Http\Controllers\AuthController::class, 'show']);
-        // 刷新用户的token
-        Route::get('/refresh', [\App\Http\Controllers\AuthController::class, 'refreshToken']);
+        // 发送邮箱令牌
+        Route::post('/sendEmailToken', [\App\Http\Controllers\AuthController::class, 'sendEmailToken']);
+        // 验证邮箱验证码接口
+        Route::post('/verifyEmail', [\App\Http\Controllers\AuthController::class, 'verifyEmail']);
         // TODO:
 //            前缀 : /CustomerRepresentative
 //            例如：
@@ -60,10 +59,12 @@ Route::group(['prefix' => '/v1'], function () {
             Route::patch('/{id}', [\App\Http\Controllers\UserController::class,'update']);
             // 禁用用户/启用用户
 //            Route::patch('/lock/{id}',[\App\Http\Controllers\UserController::class,'update']);
+            // 显示分页客户数据
+            Route::get('/',[\App\Http\Controllers\UserController::class,'paginate']);
+            // 显示所有客户
+            Route::get('/all',[\App\Http\Controllers\UserController::class,'index']);
             // 根据ID获取客户信息
             Route::get('/{id}',[\App\Http\Controllers\UserController::class,'show']);
-            // 显示所有客户
-            Route::get('/',[\App\Http\Controllers\UserController::class,'index']);
             // 显示筛选客户表单数据
             Route::post('/filter',[\App\Http\Controllers\UserController::class,'showFilter']);
         });
