@@ -64,6 +64,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
+
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_users');

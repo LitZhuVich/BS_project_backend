@@ -150,7 +150,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
-        ],200);
+        ], 200);
     }
 
     /**
@@ -180,8 +180,8 @@ class AuthController extends Controller
             $user->setAttribute('role_name', $role->role_name);
             // 返回用户信息
             return response()->json($user, 200);
-        }catch (JWTException $e){
-            return response()->json($e,401);
+        } catch (JWTException $e) {
+            return response()->json($e, 401);
         }
     }
 }

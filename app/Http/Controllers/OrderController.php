@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderPrioritie;
 use Exception;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class OrderController extends Controller
 {
@@ -16,7 +17,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return Order::all();
+        $data = Order::all();
+        return response()->json($data, 200);
     }
 
     /**
@@ -49,35 +51,9 @@ class OrderController extends Controller
             // 返回结果
             return response()->json('成功', 200);
             // return $request->status . '成功';
-        } catch (Exception $e) {
+        } catch (JWTException $e) {
             return '失败' . $e;
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * 获取全部订单数据
-     */
-    public function getOrder($id)
-    {
-        $data = Order::get();
-        $priority_id = OrderPrioritie::query()->find($id);
-        if (!$priority_id) {
-            return response()->json('优先值获取失败', 400);
-        }
-        $priority = response()->json($priority_id->priority_name, 200);
-
-        return $data;
     }
 
     /**

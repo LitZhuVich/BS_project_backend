@@ -26,7 +26,8 @@ class UserController extends Controller
      *                      传入的 AuthController 实例对象。
      * @return void
      */
-    public function __construct(AuthController $authController){
+    public function __construct(AuthController $authController)
+    {
         // 将传入的 AuthController 实例保存到 $authController 中
         $this->authController = $authController;
     }
@@ -99,15 +100,16 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(int $id){
+    public function show(int $id)
+    {
         try {
-            $user = User::query()->where('id',$id)->with('groups')->withCount('groups')->first();
-            if (!$user){
-                return response()->json('获取失败，该用户不存在',400);
+            $user = User::query()->where('id', $id)->with('groups')->withCount('groups')->first();
+            if (!$user) {
+                return response()->json('获取失败，该用户不存在', 400);
             }
-            return response()->json($user,200);
-        }catch (JWTException $e){
-            return response()->json($e,400);
+            return response()->json($user, 200);
+        } catch (JWTException $e) {
+            return response()->json($e, 400);
         }
     }
 
@@ -119,7 +121,6 @@ class UserController extends Controller
      */
     public function destroy(int $id)
     {
-
         $user = User::find($id);
         if (!$user){
             return response()->json('用户不存在',400);
@@ -127,9 +128,10 @@ class UserController extends Controller
         $user->delete();
         if ($user != 1 && $user->isAdmin()){
             return response()->json('删除失败',400);
+
         }
 
-        return response()->json('删除成功',200);
+        return response()->json('删除成功', 200);
     }
 
     /**
@@ -152,6 +154,7 @@ class UserController extends Controller
         ]);
 
         try {
+            //  $operator = JWTAuth::parseToken()->authenticate();
             // 开始进行事务
             DB::beginTransaction();
             // 创建用户并加密密码,在客户管理页面新建的客户密码默认：asd123456
@@ -173,7 +176,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             // 回滚刚才的数据库操作
             DB::rollBack();
-            logger()->error('创建用户数据保存时发生错误：'.$e->getMessage());
+            logger()->error('创建用户数据保存时发生错误：' . $e->getMessage());
             return response()->json('创建失败', 403);
         }
     }

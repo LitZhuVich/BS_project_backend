@@ -49,12 +49,13 @@ Route::group(['prefix' => '/v1'], function () {
 //            例如：
 //            Route::delete('/CustomerRepresentative/{id}',[\App\Http\Controllers\UserController::class,'destroy']);
 //            Route::post('/CustomerRepresentative/filter',[\App\Http\Controllers\UserController::class,'showMany']);
+
         // 客户分类
-        Route::group(['prefix'=>'/CustomerRepresentative'],function (){
+        Route::group(['prefix' => '/CustomerRepresentative'], function () {
             // 删除客户
-            Route::delete('/{id}',[\App\Http\Controllers\UserController::class,'destroy']);
+            Route::delete('/{id}', [\App\Http\Controllers\UserController::class, 'destroy']);
             // 新增客户信息
-            Route::post('/',[\App\Http\Controllers\UserController::class,'store']);
+            Route::post('/', [\App\Http\Controllers\UserController::class, 'store']);
             // 修改客户信息
             Route::patch('/{id}', [\App\Http\Controllers\UserController::class,'update']);
             // 禁用用户/启用用户
@@ -67,19 +68,20 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/{id}',[\App\Http\Controllers\UserController::class,'show']);
             // 显示筛选客户表单数据
             Route::post('/filter',[\App\Http\Controllers\UserController::class,'showFilter']);
+
         });
         // 组分类
-        Route::group(['prefix'=>'/group'],function (){
+        Route::group(['prefix' => '/group'], function () {
             // 获取所有组信息
-            Route::get('/',[\App\Http\Controllers\GroupController::class,'showUser']);
+            Route::get('/', [\App\Http\Controllers\GroupController::class, 'showUser']);
             // 显示所有组的名字
-            Route::get('/name',[\App\Http\Controllers\GroupController::class,'showGroupName']);
+            Route::get('/name', [\App\Http\Controllers\GroupController::class, 'showGroupName']);
             // 获取单个组信息
-            Route::get('/{id}',[\App\Http\Controllers\GroupController::class,'show']);
+            Route::get('/{id}', [\App\Http\Controllers\GroupController::class, 'show']);
             // 获取用户组名
-            Route::get('/name/{id}',[\App\Http\Controllers\GroupController::class,'showName']);
+            Route::get('/name/{id}', [\App\Http\Controllers\GroupController::class, 'showName']);
         });
-//        TODO: cly 你也改成上面用组分类的格式。收到就可以删除这段 TODO注释了！
+        //        TODO: cly 你也改成上面用组分类的格式。收到就可以删除这段 TODO注释了！
         /*
             工单
         */
