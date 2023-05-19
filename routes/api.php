@@ -30,6 +30,7 @@ Route::group(['prefix' => '/v1'], function () {
     });
     // 刷新用户的token
     Route::get('/refresh', [\App\Http\Controllers\AuthController::class, 'refreshToken']);
+
     /**
      * 受保护的  Api 接口
      * 没有登录无法访问
@@ -57,7 +58,13 @@ Route::group(['prefix' => '/v1'], function () {
             // 新增客户信息
             Route::post('/', [\App\Http\Controllers\UserController::class, 'store']);
             // 修改客户信息
-            Route::patch('/{id}', [\App\Http\Controllers\UserController::class,'update']);
+            Route::put('/{id}', [\App\Http\Controllers\UserController::class,'update']);
+            // 绑定客户姓名
+            Route::patch('/{id}/username', [\App\Http\Controllers\UserController::class,'updateUsername']);
+            // 绑定客户邮箱
+            Route::patch('/{id}/email', [\App\Http\Controllers\UserController::class,'updateEmail']);
+            // 绑定客户手机号
+            Route::patch('/{id}/phone', [\App\Http\Controllers\UserController::class,'updatePhone']);
             // 禁用用户/启用用户
 //            Route::patch('/lock/{id}',[\App\Http\Controllers\UserController::class,'update']);
             // 显示分页客户数据
@@ -68,7 +75,6 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/{id}',[\App\Http\Controllers\UserController::class,'show']);
             // 显示筛选客户表单数据
             Route::post('/filter',[\App\Http\Controllers\UserController::class,'showFilter']);
-
         });
         // 组分类
         Route::group(['prefix' => '/group'], function () {

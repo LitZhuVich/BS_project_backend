@@ -128,7 +128,6 @@ class UserController extends Controller
         $user->delete();
         if ($user != 1 && $user->isAdmin()){
             return response()->json('删除失败',400);
-
         }
 
         return response()->json('删除成功', 200);
@@ -154,7 +153,6 @@ class UserController extends Controller
         ]);
 
         try {
-            //  $operator = JWTAuth::parseToken()->authenticate();
             // 开始进行事务
             DB::beginTransaction();
             // 创建用户并加密密码,在客户管理页面新建的客户密码默认：asd123456
@@ -196,7 +194,7 @@ class UserController extends Controller
             'username'      => ['required', 'max:255'],
             'address'       => ['nullable'],
             'remark'        => ['nullable'],
-            'phone'         => ['nullable', 'integer', 'digits:11'],
+            'phone'         => ['nullable', 'integer'],
             'group_name'    => ['nullable', 'array'],
         ]);
         try {
@@ -220,13 +218,87 @@ class UserController extends Controller
             $user->groups()->sync($groupIds);
             // 提交事务，如果事务已成功执行，则将更改提交到数据库。
             DB::commit();
-            return response()->json($user, 200);
+//            return response()->json($user, 200);
             return response()->json('更新成功', 200);
         } catch (\Throwable $e) {
             // 回滚刚才的数据库操作
             DB::rollBack();
             return response()->json('更新失败：' . $e->getMessage(), 500);
         }
+    }
+
+    /**
+     * 绑定邮箱
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateEmail(Request $request,int $id)
+    {
+        $validatedData = $request->validate([
+            'email' => ['required', 'email', 'unique:users,email'],
+        ]);
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json('用户不存在', 404);
+        }
+
+        $user->email = $validatedData['email'];
+        $user->save();
+
+        return response()->json(['message'=>'邮箱修改成功','email'=>$user->email], 200);
+    }
+
+    /**
+     * 绑定手机号
+     *
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePhone(Request $request,int $id)
+    {
+        $validatedData = $request->validate([
+            'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
+        ]);
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json('用户不存在', 404);
+        }
+
+        $user->phone = $validatedData['phone'];
+        $user->save();
+
+        return response()->json(['message'=>'手机号修改成功','phone'=>$user->phone], 200);
+    }
+
+    /**
+     * 绑定用户名
+     *
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateUsername(Request $request,int $id)
+    {
+        $validatedData = $request->validate([
+            'username' => ['required', 'unique:users,username'],
+        ]);
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json('用户不存在', 404);
+        }
+
+        $user->username = $validatedData['username'];
+        $user->save();
+
+        return response()->json(['message'=>'用户名修改成功','username'=>$user->username], 200);
     }
 
     /**

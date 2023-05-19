@@ -29,8 +29,8 @@ class AuthController extends Controller
             'username' => 'required|string|unique:users|max:255',
             'password' => 'required|string|confirmed',
         ]);
-        //        当您使用 confirmed 规则时，Laravel 会自动检查与被验证字段名称相同，但后缀为 _confirmation 的字段。例如，如果您想验证 password 字段
-        //          ，Laravel 会自动检查 password_confirmation 字段
+        // 当您使用 confirmed 规则时，Laravel 会自动检查与被验证字段名称相同，但后缀为 _confirmation 的字段。例如，如果您想验证 password 字段
+        // ，Laravel 会自动检查 password_confirmation 字段
         // 验证失败
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -53,7 +53,6 @@ class AuthController extends Controller
         // 返回创建成功信息
         return response()->json([
             'access_token' => $token,
-            'refresh_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         ], 200);
