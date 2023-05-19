@@ -90,6 +90,8 @@ Route::group(['prefix' => '/v1'], function () {
         Route::get('/orderPage', [\App\Http\Controllers\OrderController::class, 'paginate']);
         // 发布工单
         Route::post('/order', [\App\Http\Controllers\OrderController::class, 'create']);
+        // 根据用户名查询工单
+        Route::post('/getOrderByUsername', [\App\Http\Controllers\OrderController::class, 'getOrderByUsername']);
         /*
             工单类型
         */
