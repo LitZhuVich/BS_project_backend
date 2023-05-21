@@ -92,6 +92,8 @@ Route::group(['prefix' => '/v1'], function () {
         Route::post('/order', [\App\Http\Controllers\OrderController::class, 'create']);
         // 根据用户名查询工单
         Route::post('/getOrderByUsername', [\App\Http\Controllers\OrderController::class, 'getOrderByUsername']);
+        // 获取未分配的工单信息
+        Route::get('/getToBeDoneOrder', [\App\Http\Controllers\OrderController::class, 'getToBeDoneOrder']);
         /*
             工单类型
         */

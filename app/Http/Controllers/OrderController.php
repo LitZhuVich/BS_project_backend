@@ -51,7 +51,19 @@ class OrderController extends Controller
         }
         return response()->json($order, 200);
     }
-
+    // 获取未分配的工单信息
+    public function getToBeDoneOrder(Request $request)
+    {
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $order = Order::query()->where('status_id', '=', 1)->paginate($page_size);
+        if (!$order) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($order, 200);
+    }
     /**
      * 创建工单
      *
