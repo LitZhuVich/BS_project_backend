@@ -64,6 +64,8 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/', [\App\Http\Controllers\UserController::class, 'paginate']);
             // 显示所有客户
             Route::get('/all', [\App\Http\Controllers\UserController::class, 'index']);
+            // 显示所有用户
+            Route::get('/getAllUsers', [\App\Http\Controllers\UserController::class, 'getAllUsers']);
             // 根据ID获取客户信息
             Route::get('/{id}', [\App\Http\Controllers\UserController::class, 'show']);
             // 显示筛选客户表单数据

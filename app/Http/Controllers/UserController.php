@@ -31,9 +31,17 @@ class UserController extends Controller
         // 将传入的 AuthController 实例保存到 $authController 中
         $this->authController = $authController;
     }
-
+    // 显示所有用户
+    public function getAllUsers()
+    {
+        $user = User::all();
+        if (!$user) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($user, 200);
+    }
     /**
-     * 显示所有数据
+     * 显示所有role_id为1的数据
      *
      * @return \Illuminate\Http\JsonResponse
      */
