@@ -15,7 +15,6 @@ class OrderType extends Model
     ];
 
     protected $hidden = [
-        'id',
         'type_description'
     ];
 

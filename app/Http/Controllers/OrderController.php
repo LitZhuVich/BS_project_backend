@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderPrioritie;
-use Exception;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrderController extends Controller
 {
@@ -22,6 +21,26 @@ class OrderController extends Controller
     }
 
     /**
+     * 分页显示所有订单信息
+     * 使用类似： '/Order?pageSize=10' 方式调用
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function paginate(Request $request)
+    {
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $order = Order::query()->paginate($page_size);
+        if (!$order) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($order, 200);
+    }
+
+    /**
      * 创建工单
      *
      * @return \Illuminate\Http\Response
@@ -29,6 +48,8 @@ class OrderController extends Controller
     public function create(Request $request)
     {
         try {
+            $user = JWTAuth::parseToken()->authenticate();
+
             $date_string = $request->appointment;
             $time_stamp = strtotime($date_string);
             $date_time = date("Y-m-d", $time_stamp);
@@ -37,22 +58,21 @@ class OrderController extends Controller
                 'priority_id' => $request->priority,
                 'status_id' => $request->status,
                 'type_id' => $request->orderType,
-                'user_id' => $request->user,
+                'user_id' => $user->id,
                 'phone' => $request->phone,
                 'title' => $request->title,
                 'time_limit' => $request->timeLimit,
                 'description' => $request->description,
-                // 'attachment' => $request->fileList,
                 'isOnLine' => $request->isOnLine,
                 'address' => $request->address,
                 'appointment' => $date_time
             ];
-            Order::create($data);
+            $order = Order::create($data);
             // 返回结果
-            return response()->json('成功', 200);
+            return response()->json($order, 200);
             // return $request->status . '成功';
-        } catch (JWTException $e) {
-            return '失败' . $e;
+        } catch (\Throwable $e) {
+            return response()->json('失败'.$e->getMessage(),400);
         }
     }
 

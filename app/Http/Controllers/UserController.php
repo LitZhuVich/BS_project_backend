@@ -13,23 +13,23 @@ class UserController extends Controller
 {
     /**
      * 创建一个受保护的全局变量
-     * AuthController 实例对象
+     * UploadController 实例对象
      *
-     * @var \App\Http\Controllers\AuthController
+     * @var \App\Http\Controllers\UploadController
      */
-    protected $authController;
+    protected $uploadController;
 
     /**
      * 构造函数
      *
-     * @param \App\Http\Controllers\AuthController $authController
-     *                      传入的 AuthController 实例对象。
+     * @param \App\Http\Controllers\UploadController $authController
+     *                      传入的 UploadController 实例对象。
      * @return void
      */
-    public function __construct(AuthController $authController)
+    public function __construct(UploadController $uploadController)
     {
         // 将传入的 AuthController 实例保存到 $authController 中
-        $this->authController = $authController;
+        $this->uploadController = $uploadController;
     }
 
     /**
@@ -40,11 +40,11 @@ class UserController extends Controller
     public function index()
     {
         // 接收要查询的数据类型
-        $user = User::query()->with('groups')->withCount('groups')->where('role_id',1)->get();
-        if (!$user){
-            return response()->json('获取失败',400);
+        $user = User::query()->with('groups')->withCount('groups')->where('role_id', 1)->get();
+        if (!$user) {
+            return response()->json('获取失败', 400);
         }
-        return response()->json($user,200);
+        return response()->json($user, 200);
     }
 
     /**
@@ -54,17 +54,18 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function paginate(Request $request){
+    public function paginate(Request $request)
+    {
         // 页面数据大小
         $page_size = $request->input('pageSize');
         // 接收要查询的数据类型
         // paginate表示显示多少条的数据
-        $user = User::query()->with('groups')->withCount('groups')->where('role_id',1)
+        $user = User::query()->with('groups')->withCount('groups')->where('role_id', 1)
             ->paginate($page_size);
-        if (!$user){
-            return response()->json('获取失败',400);
+        if (!$user) {
+            return response()->json('获取失败', 400);
         }
-        return response()->json($user,200);
+        return response()->json($user, 200);
     }
 
     /**
@@ -86,11 +87,11 @@ class UserController extends Controller
             $allowedFields = ['companyname', 'username', 'phone'];
             $field = in_array($searchType, $allowedFields) ? $searchType : 'companyname';
             // 使用模糊查询获取数据
-            $filteredData = User::query()->where($field,'like',"%$searchValue%")->where('role_id',1)
+            $filteredData = User::query()->where($field, 'like', "%$searchValue%")->where('role_id', 1)
                 ->with('groups')->withCount('groups')->paginate($page_size);
-            return response()->json($filteredData,200);
-        }catch (JWTException $e){
-            return response()->json('获取失败'.$e,400);
+            return response()->json($filteredData, 200);
+        } catch (\Throwable $e) {
+            return response()->json('获取失败' . $e->getMessage(), 400);
         }
     }
 
@@ -103,12 +104,12 @@ class UserController extends Controller
     public function show(int $id)
     {
         try {
-            $user = User::query()->where('id', $id)->with('groups')->withCount('groups')->first();
+            $user = User::query()->where('id', $id)->where('role_id',1)->with('groups')->withCount('groups')->first();
             if (!$user) {
                 return response()->json('获取失败，该用户不存在', 400);
             }
             return response()->json($user, 200);
-        } catch (JWTException $e) {
+        } catch (\Throwable $e) {
             return response()->json($e, 400);
         }
     }
@@ -122,12 +123,13 @@ class UserController extends Controller
     public function destroy(int $id)
     {
         $user = User::find($id);
-        if (!$user){
-            return response()->json('用户不存在',400);
+        if (!$user) {
+            return response()->json('用户不存在', 400);
         }
         $user->delete();
-        if ($user != 1 && $user->isAdmin()){
-            return response()->json('删除失败',400);
+
+        if ($user != 1 && $user->isAdmin()) {
+            return response()->json('删除失败', 400);
         }
 
         return response()->json('删除成功', 200);
@@ -144,7 +146,7 @@ class UserController extends Controller
     {
         // 验证请求数据
         $validatedData = $request->validate([
-            'companyname'   => ['nullable','unique:users','max:255'],
+            'companyname'   => ['nullable', 'unique:users', 'max:255'],
             'username'      => ['required', 'max:255'],
             'address'       => ['nullable'],
             'remark'        => ['nullable'],
@@ -228,11 +230,36 @@ class UserController extends Controller
     }
 
     /**
+     * 更新字段的公共方法
+     *
+     * @param array $validatedData
+     * @param string $field
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateField(array $validatedData,string $field,int $id)
+    {
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json('用户不存在', 404);
+            }
+
+            $user->$field = $validatedData["$field"];
+            $user->save();
+
+            return $user;
+        }catch (\Throwable $e){
+            return response()->json('修改失败'.$e->getMessage(),500);
+        }
+    }
+
+    /**
      * 绑定邮箱
      *
      * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
     public function updateEmail(Request $request,int $id)
     {
@@ -240,24 +267,17 @@ class UserController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
         ]);
 
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json('用户不存在', 404);
-        }
+        $data = $this->updateField($validatedData, 'email', $id);
 
-        $user->email = $validatedData['email'];
-        $user->save();
-
-        return response()->json(['message'=>'邮箱修改成功','email'=>$user->email], 200);
+        return response()->json(['message'=>'修改成功','email'=>$data->email], 200);
     }
 
     /**
      * 绑定手机号
      *
-     *
      * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
     public function updatePhone(Request $request,int $id)
     {
@@ -265,24 +285,17 @@ class UserController extends Controller
             'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
         ]);
 
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json('用户不存在', 404);
-        }
+        $data = $this->updateField($validatedData, 'phone', $id);
 
-        $user->phone = $validatedData['phone'];
-        $user->save();
-
-        return response()->json(['message'=>'手机号修改成功','phone'=>$user->phone], 200);
+        return response()->json(['message'=>'修改成功','phone'=>$data->phone], 200);
     }
 
     /**
      * 绑定用户名
      *
-     *
      * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
     public function updateUsername(Request $request,int $id)
     {
@@ -290,15 +303,23 @@ class UserController extends Controller
             'username' => ['required', 'unique:users,username'],
         ]);
 
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json('用户不存在', 404);
-        }
+        $data = $this->updateField($validatedData, 'username', $id);
 
-        $user->username = $validatedData['username'];
-        $user->save();
+        return response()->json(['message'=>'修改成功','username'=>$data->username], 200);
+    }
 
-        return response()->json(['message'=>'用户名修改成功','username'=>$user->username], 200);
+    /**
+     * 绑定邮箱
+     *
+     * @param Request $request
+     * @param int $id
+     * @return void
+     */
+    public function updateAvatar(Request $request,int $id)
+    {
+        // 执行上传控制器中上传用户头像的方法
+        $data = $this->uploadController->userUploadAvatar($request,$id);
+        return response()->json($data,200);
     }
 
     /**
@@ -308,6 +329,5 @@ class UserController extends Controller
      */
     public function lock()
     {
-
     }
 }
