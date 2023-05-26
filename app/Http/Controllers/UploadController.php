@@ -25,7 +25,7 @@ class UploadController extends Controller
     }
 
     /**
-     * 获取用户头像所有数据1
+     * 获取用户头像所有数据
      *
      * @return \Illuminate\Http\JsonResponse
      */

@@ -60,6 +60,8 @@ Route::group(['prefix' => '/v1'], function () {
             Route::put('/{id}', [\App\Http\Controllers\UserController::class,'update']);
             // 绑定客户姓名
             Route::patch('/{id}/username', [\App\Http\Controllers\UserController::class,'updateUsername']);
+            // 修改密码
+            Route::patch('/{id}/password', [\App\Http\Controllers\UserController::class,'updatePassword']);
             // 绑定客户邮箱
             Route::patch('/{id}/email', [\App\Http\Controllers\UserController::class,'updateEmail']);
             // 绑定客户手机号
@@ -97,6 +99,12 @@ Route::group(['prefix' => '/v1'], function () {
             // 上传文件
             Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'orderUpload']);
         });
+
+        Route::group(['prefix'=>'/order'],function (){
+            Route::get('/showSuccessOrder', [\App\Http\Controllers\OrderController::class, 'showSuccessOrder']);
+            Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'showMyOrder']);
+        });
+
         //        TODO: cly 你也改成上面用组分类的格式。收到就可以自行删除这段 TODO注释了！
         /*
             工单

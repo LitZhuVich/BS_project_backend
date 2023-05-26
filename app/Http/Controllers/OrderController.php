@@ -67,13 +67,37 @@ class OrderController extends Controller
                 'address' => $request->address,
                 'appointment' => $date_time
             ];
+
             $order = Order::create($data);
             // 返回结果
             return response()->json($order, 200);
-            // return $request->status . '成功';
+
         } catch (\Throwable $e) {
             return response()->json('失败'.$e->getMessage(),400);
         }
+    }
+
+    /**
+     * 显示自己的工单
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showMyOrder(int $id)
+    {
+        $data = Order::query()->where('user_id',$id)->get();
+        return response()->json($data,200);
+    }
+
+    /**
+     * 显示状态为完成的工单信息
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showSuccessOrder(){
+        // 状态ID为4的代表已完成状态
+        $data = Order::query()->where('status_id',4)->get();
+        return response()->json($data,200);
     }
 
     /**

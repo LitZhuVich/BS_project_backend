@@ -28,7 +28,7 @@ class UserController extends Controller
      */
     public function __construct(UploadController $uploadController)
     {
-        // 将传入的 AuthController 实例保存到 $authController 中
+        // 将传入的 UploadController 实例保存到 $uploadController 中
         $this->uploadController = $uploadController;
     }
 
@@ -220,7 +220,7 @@ class UserController extends Controller
             $user->groups()->sync($groupIds);
             // 提交事务，如果事务已成功执行，则将更改提交到数据库。
             DB::commit();
-//            return response()->json($user, 200);
+
             return response()->json('更新成功', 200);
         } catch (\Throwable $e) {
             // 回滚刚才的数据库操作
@@ -245,9 +245,14 @@ class UserController extends Controller
                 return response()->json('用户不存在', 404);
             }
 
-            $user->$field = $validatedData["$field"];
-            $user->save();
+            if ($field == "password"){
+                $user->password = Hash::make($validatedData["password"], ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']);
+            }else{
+                $user->$field = $validatedData["$field"];
+            }
 
+            // 保存修改
+            $user->save();
             return $user;
         }catch (\Throwable $e){
             return response()->json('修改失败'.$e->getMessage(),500);
@@ -309,7 +314,7 @@ class UserController extends Controller
     }
 
     /**
-     * 绑定邮箱
+     * 绑定头像
      *
      * @param Request $request
      * @param int $id
@@ -319,7 +324,19 @@ class UserController extends Controller
     {
         // 执行上传控制器中上传用户头像的方法
         $data = $this->uploadController->userUploadAvatar($request,$id);
+
         return response()->json($data,200);
+    }
+
+    public function updatePassword(Request $request,int $id)
+    {
+        $validatedData = $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        $data = $this->updateField($validatedData, 'password', $id);
+
+        return response()->json(['message'=>'修改成功','password'=>$data], 200);
     }
 
     /**
