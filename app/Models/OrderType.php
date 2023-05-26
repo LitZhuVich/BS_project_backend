@@ -17,4 +17,9 @@ class OrderType extends Model
     protected $hidden = [
         'type_description'
     ];
+
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
 }

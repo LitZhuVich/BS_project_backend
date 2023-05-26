@@ -5,21 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Group extends Model
+class userAvatar extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'group_name',
+        'user_id',
+        'avatar_name',
+        'avatar_url'
     ];
 
-    protected $hidden = [
-        'pivot'
-    ];
-    public function users()
+    public function user()
     {
-        return $this->belongsToMany(User::class, 'group_users');
+        return $this->belongsTo(User::class);
     }
 }

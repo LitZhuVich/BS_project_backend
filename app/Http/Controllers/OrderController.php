@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\OrderPrioritie;
-use Exception;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrderController extends Controller
 {
@@ -16,7 +16,28 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return Order::get();
+        $data = Order::all();
+        return response()->json($data, 200);
+    }
+
+    /**
+     * 分页显示所有订单信息
+     * 使用类似： '/Order?pageSize=10' 方式调用
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function paginate(Request $request)
+    {
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $order = Order::query()->paginate($page_size);
+        if (!$order) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($order, 200);
     }
 
     /**
@@ -27,6 +48,8 @@ class OrderController extends Controller
     public function create(Request $request)
     {
         try {
+            $user = JWTAuth::parseToken()->authenticate();
+
             $date_string = $request->appointment;
             $time_stamp = strtotime($date_string);
             $date_time = date("Y-m-d", $time_stamp);
@@ -35,49 +58,46 @@ class OrderController extends Controller
                 'priority_id' => $request->priority,
                 'status_id' => $request->status,
                 'type_id' => $request->orderType,
-                'user_id' => $request->user,
+                'user_id' => $user->id,
                 'phone' => $request->phone,
                 'title' => $request->title,
                 'time_limit' => $request->timeLimit,
                 'description' => $request->description,
-                // 'attachment' => $request->fileList,
                 'isOnLine' => $request->isOnLine,
                 'address' => $request->address,
                 'appointment' => $date_time
             ];
-            Order::create($data);
+
+            $order = Order::create($data);
             // 返回结果
-            return response()->json('成功', 200);
-            // return $request->status . '成功';
-        } catch (Exception $e) {
-            return '失败' . $e;
+            return response()->json($order, 200);
+
+        } catch (\Throwable $e) {
+            return response()->json('失败'.$e->getMessage(),400);
         }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 显示自己的工单
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function showMyOrder(int $id)
     {
-        //
+        $data = Order::query()->where('user_id',$id)->get();
+        return response()->json($data,200);
     }
 
     /**
-     * 获取全部订单数据
+     * 显示状态为完成的工单信息
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function getOrder($id)
-    {
-        $data = Order::get();
-        $priority_id = OrderPrioritie::query()->find($id);
-        if (!$priority_id) {
-            return response()->json('优先值获取失败', 400);
-        }
-        $priority = response()->json($priority_id->priority_name, 200);
-
-        return $data;
+    public function showSuccessOrder(){
+        // 状态ID为4的代表已完成状态
+        $data = Order::query()->where('status_id',4)->get();
+        return response()->json($data,200);
     }
 
     /**
