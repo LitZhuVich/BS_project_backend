@@ -32,6 +32,24 @@ class UserController extends Controller
         $this->uploadController = $uploadController;
     }
 
+    // 显示所有用户
+    public function getAllUsers()
+    {
+        $user = User::all();
+        if (!$user) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($user, 200);
+    }
+    // 显示所有工程师
+    public function getAllEngineers()
+    {
+        $engineer = User::query()->where('role_id', 2)->get();
+        if (!$engineer) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($engineer, 200);
+    }
     /**
      * 显示所有数据
      *
@@ -104,7 +122,7 @@ class UserController extends Controller
     public function show(int $id)
     {
         try {
-            $user = User::query()->where('id', $id)->where('role_id',1)->with('groups')->withCount('groups')->first();
+            $user = User::query()->where('id', $id)->where('role_id', 1)->with('groups')->withCount('groups')->first();
             if (!$user) {
                 return response()->json('获取失败，该用户不存在', 400);
             }
@@ -237,7 +255,7 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateField(array $validatedData,string $field,int $id)
+    public function updateField(array $validatedData, string $field, int $id)
     {
         try {
             $user = User::find($id);
@@ -245,17 +263,17 @@ class UserController extends Controller
                 return response()->json('用户不存在', 404);
             }
 
-            if ($field == "password"){
+            if ($field == "password") {
                 $user->password = Hash::make($validatedData["password"], ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']);
-            }else{
+            } else {
                 $user->$field = $validatedData["$field"];
             }
 
             // 保存修改
             $user->save();
             return $user;
-        }catch (\Throwable $e){
-            return response()->json('修改失败'.$e->getMessage(),500);
+        } catch (\Throwable $e) {
+            return response()->json('修改失败' . $e->getMessage(), 500);
         }
     }
 
@@ -266,7 +284,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updateEmail(Request $request,int $id)
+    public function updateEmail(Request $request, int $id)
     {
         $validatedData = $request->validate([
             'email' => ['required', 'email', 'unique:users,email'],
@@ -274,7 +292,7 @@ class UserController extends Controller
 
         $data = $this->updateField($validatedData, 'email', $id);
 
-        return response()->json(['message'=>'修改成功','email'=>$data->email], 200);
+        return response()->json(['message' => '修改成功', 'email' => $data->email], 200);
     }
 
     /**
@@ -284,7 +302,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updatePhone(Request $request,int $id)
+    public function updatePhone(Request $request, int $id)
     {
         $validatedData = $request->validate([
             'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
@@ -292,7 +310,7 @@ class UserController extends Controller
 
         $data = $this->updateField($validatedData, 'phone', $id);
 
-        return response()->json(['message'=>'修改成功','phone'=>$data->phone], 200);
+        return response()->json(['message' => '修改成功', 'phone' => $data->phone], 200);
     }
 
     /**
@@ -302,7 +320,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updateUsername(Request $request,int $id)
+    public function updateUsername(Request $request, int $id)
     {
         $validatedData = $request->validate([
             'username' => ['required', 'unique:users,username'],
@@ -310,7 +328,7 @@ class UserController extends Controller
 
         $data = $this->updateField($validatedData, 'username', $id);
 
-        return response()->json(['message'=>'修改成功','username'=>$data->username], 200);
+        return response()->json(['message' => '修改成功', 'username' => $data->username], 200);
     }
 
     /**
@@ -320,15 +338,15 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updateAvatar(Request $request,int $id)
+    public function updateAvatar(Request $request, int $id)
     {
         // 执行上传控制器中上传用户头像的方法
-        $data = $this->uploadController->userUploadAvatar($request,$id);
+        $data = $this->uploadController->userUploadAvatar($request, $id);
 
-        return response()->json($data,200);
+        return response()->json($data, 200);
     }
 
-    public function updatePassword(Request $request,int $id)
+    public function updatePassword(Request $request, int $id)
     {
         $validatedData = $request->validate([
             'password' => ['required', 'string'],
@@ -336,7 +354,7 @@ class UserController extends Controller
 
         $data = $this->updateField($validatedData, 'password', $id);
 
-        return response()->json(['message'=>'修改成功','password'=>$data], 200);
+        return response()->json(['message' => '修改成功', 'password' => $data], 200);
     }
 
     /**

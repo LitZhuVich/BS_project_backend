@@ -42,8 +42,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password, ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
             'is_verified' => 0,
-            'email_verification_token' => rand(100000,999999), // 返回6位随机数字
-            //            TODO:后期需要修改，现在不允许为空
+            'email_verification_token' => rand(100000, 999999), // 返回6位随机数字
+            // TODO:后期需要修改，现在不允许为空
             'companyname'   => '',
         ]);
 
@@ -80,7 +80,7 @@ class AuthController extends Controller
                 ], 200);
             }
         } catch (JWTException $e) {
-            return response()->json('账号或密码有误'.$e, 500);
+            return response()->json('账号或密码有误' . $e, 500);
         }
     }
 
