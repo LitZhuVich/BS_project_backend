@@ -29,8 +29,8 @@ class AuthController extends Controller
             'username' => 'required|string|unique:users|max:255',
             'password' => 'required|string|confirmed',
         ]);
-        //        当您使用 confirmed 规则时，Laravel 会自动检查与被验证字段名称相同，但后缀为 _confirmation 的字段。例如，如果您想验证 password 字段
-        //          ，Laravel 会自动检查 password_confirmation 字段
+        // 当您使用 confirmed 规则时，Laravel 会自动检查与被验证字段名称相同，但后缀为 _confirmation 的字段。例如，如果您想验证 password 字段
+        // ，Laravel 会自动检查 password_confirmation 字段
         // 验证失败
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -42,8 +42,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password, ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']),
             'is_verified' => 0,
-            'email_verification_token' => Str::random(32),
-            //            TODO:后期需要修改，现在不允许为空
+            'email_verification_token' => rand(100000, 999999), // 返回6位随机数字
+            // TODO:后期需要修改，现在不允许为空
             'companyname'   => '',
         ]);
 
@@ -53,57 +53,9 @@ class AuthController extends Controller
         // 返回创建成功信息
         return response()->json([
             'access_token' => $token,
-            'refresh_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         ], 200);
-    }
-
-    /**
-     * 发送邮箱验证码
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function sendEmailToken(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-//            'email' => 'required|string|unique:users|max:255|email:filter',
-//            'email' => 'required|string|max:255|email:filter',
-            'user_id' => 'required|integer',
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-        // 获取用户
-        $user = User::query()->find($request->post('user_id'));
-        if (!$user) {
-            return response()->json('获取用户失败', 400);
-        }
-        // 发送邮箱
-        Mail::to($user)->queue(new authPost($user));
-        return response()->json('发送成功，请检查您的电子邮件以验证帐户', 201);
-    }
-
-    /**
-     * 验证邮箱
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function verifyEmail(Request $request)
-    {
-        $user = User::where('email_verification_token', $request->input('token'))->first();
-
-        if (!$user) {
-            return response()->json('令牌输入有误', 400);
-        }
-
-        $user->is_verified = 1;
-        $user->email_verification_token = null;
-        $user->save();
-
-        return response()->json('电子邮件已成功验证', 200);
     }
 
     /**
@@ -128,7 +80,7 @@ class AuthController extends Controller
                 ], 200);
             }
         } catch (JWTException $e) {
-            return response()->json('账号或密码有误'.$e, 500);
+            return response()->json('账号或密码有误' . $e, 500);
         }
     }
 

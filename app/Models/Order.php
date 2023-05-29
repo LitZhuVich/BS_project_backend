@@ -26,8 +26,12 @@ class Order extends Model
         'appointment'
     ];
 
-
     protected $appends = ['username', 'status', 'type', 'priority'];
+
+    protected $casts = [
+        'created_at' => 'date:Y-m-d H:i:s',
+        'updated_at' => 'date:Y-m-d H:i:s'
+    ];
 
     public function priority()
     {
@@ -48,7 +52,6 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-    // 
     public function getUsernameAttribute()
     {
         $user = User::query()->find($this->user_id);
