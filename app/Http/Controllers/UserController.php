@@ -56,7 +56,7 @@ class UserController extends Controller
      *
      * @return JsonResponse
      */
-    public function index():JsonResponse
+    public function index(): JsonResponse
     {
         // 接收要查询的数据类型
         $user = User::query()->with('groups')->withCount('groups')
@@ -74,7 +74,7 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function paginate(Request $request):JsonResponse
+    public function paginate(Request $request): JsonResponse
     {
         // 页面数据大小
         $page_size = $request->input('pageSize');
@@ -94,7 +94,7 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function showFilter(Request $request):JsonResponse
+    public function showFilter(Request $request): JsonResponse
     {
         try {
             // 页面数据大小
@@ -122,17 +122,13 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show(int $id):JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
-<<<<<<< HEAD
             $user = User::query()
                 ->where('id', $id)
-                ->where('role_id',1)
+                ->where('role_id', 1)
                 ->with('groups')->withCount('groups')->first();
-=======
-            $user = User::query()->where('id', $id)->where('role_id', 1)->with('groups')->withCount('groups')->first();
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
             if (!$user) {
                 return response()->json('获取失败，该用户不存在', 400);
             }
@@ -148,7 +144,7 @@ class UserController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function destroy(int $id):JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         $user = User::find($id);
         if (!$user) {
@@ -170,7 +166,7 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return JsonResponse
      */
-    public function store(Request $request):JsonResponse
+    public function store(Request $request): JsonResponse
     {
         // 验证请求数据
         $validatedData = $request->validate([
@@ -216,7 +212,7 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, int $id):JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         // 验证请求数据
         $validatedData = $request->validate([
@@ -265,11 +261,7 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-<<<<<<< HEAD
-    public function updateField(array $validatedData,string $field,int $id):JsonResponse
-=======
-    public function updateField(array $validatedData, string $field, int $id)
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
+    public function updateField(array $validatedData, string $field, int $id): JsonResponse
     {
         try {
             $user = User::find($id);
@@ -298,11 +290,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-<<<<<<< HEAD
-    public function updateEmail(Request $request,int $id):JsonResponse
-=======
-    public function updateEmail(Request $request, int $id)
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
+    public function updateEmail(Request $request, int $id): JsonResponse
     {
         $validatedData = $request->validate([
             'email' => ['required', 'email', 'unique:users,email'],
@@ -320,11 +308,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-<<<<<<< HEAD
-    public function updatePhone(Request $request,int $id):JsonResponse
-=======
-    public function updatePhone(Request $request, int $id)
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
+    public function updatePhone(Request $request, int $id): JsonResponse
     {
         $validatedData = $request->validate([
             'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
@@ -342,11 +326,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-<<<<<<< HEAD
-    public function updateUsername(Request $request,int $id):JsonResponse
-=======
-    public function updateUsername(Request $request, int $id)
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
+    public function updateUsername(Request $request, int $id): JsonResponse
     {
         $validatedData = $request->validate([
             'username' => ['required', 'unique:users,username'],
@@ -364,11 +344,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-<<<<<<< HEAD
-    public function updateAvatar(Request $request,int $id):JsonResponse
-=======
-    public function updateAvatar(Request $request, int $id)
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
+    public function updateAvatar(Request $request, int $id): JsonResponse
     {
         // 执行上传控制器中上传用户头像的方法
         $data = $this->uploadController->userUploadAvatar($request, $id);
@@ -376,11 +352,7 @@ class UserController extends Controller
         return response()->json($data, 200);
     }
 
-<<<<<<< HEAD
-    public function updatePassword(Request $request,int $id):JsonResponse
-=======
-    public function updatePassword(Request $request, int $id)
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
+    public function updatePassword(Request $request, int $id): JsonResponse
     {
         $validatedData = $request->validate([
             'password' => ['required', 'string'],
@@ -398,7 +370,5 @@ class UserController extends Controller
      */
     public function lock()
     {
-
     }
-
 }
