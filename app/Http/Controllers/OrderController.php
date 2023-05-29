@@ -63,10 +63,35 @@ class OrderController extends Controller
         }
         return response()->json($order, 200);
     }
-
+    // 根据用户名分页显示订单信息
+    public function getOrderByUsername(Request $request)
+    {
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $order = Order::query()->where('user_id', '=', $request->user_id)->paginate($page_size);
+        if (!$order) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($order, 200);
+    }
+    // 获取未分配的工单信息
+    public function getToBeDoneOrder(Request $request)
+    {
+        // 页面数据大小
+        $page_size = $request->input('pageSize');
+        // 接收要查询的数据类型
+        // paginate表示显示多少条的数据
+        $order = Order::query()->where('status_id', '=', 1)->paginate($page_size);
+        if (!$order) {
+            return response()->json('获取失败', 400);
+        }
+        return response()->json($order, 200);
+    }
     /**
      * 创建工单
-     *
+     * TODO: 需要优化
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
@@ -95,9 +120,8 @@ class OrderController extends Controller
             $order = Order::create($data);
             // 返回结果
             return response()->json($order, 200);
-
         } catch (\Throwable $e) {
-            return response()->json('失败'.$e->getMessage(),400);
+            return response()->json('失败' . $e->getMessage(), 400);
         }
     }
 
@@ -109,8 +133,8 @@ class OrderController extends Controller
      */
     public function showUser(int $id): JsonResponse
     {
-        $data = Order::query()->where('user_id',$id)->get();
-        return response()->json($data,200);
+        $data = Order::query()->where('user_id', $id)->get();
+        return response()->json($data, 200);
     }
 
     /**
@@ -123,6 +147,12 @@ class OrderController extends Controller
     {
         $data = Order::query()->where('id',$id)->get();
         return response()->json($data,200);
+    }
+    public function showSuccessOrder()
+    {
+        // 状态ID为4的代表已完成状态
+        $data = Order::query()->where('status_id', 4)->get();
+        return response()->json($data, 200);
     }
 
     /**

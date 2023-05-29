@@ -57,23 +57,27 @@ Route::group(['prefix' => '/v1'], function () {
             // 新增客户信息
             Route::post('/', [\App\Http\Controllers\UserController::class, 'store']);
             // 修改客户信息
-            Route::put('/{id}', [\App\Http\Controllers\UserController::class,'update']);
+            Route::put('/{id}', [\App\Http\Controllers\UserController::class, 'update']);
             // 绑定客户姓名
-            Route::patch('/{id}/username', [\App\Http\Controllers\UserController::class,'updateUsername']);
+            Route::patch('/{id}/username', [\App\Http\Controllers\UserController::class, 'updateUsername']);
             // 修改密码
-            Route::patch('/{id}/password', [\App\Http\Controllers\UserController::class,'updatePassword']);
+            Route::patch('/{id}/password', [\App\Http\Controllers\UserController::class, 'updatePassword']);
             // 绑定客户邮箱
-            Route::patch('/{id}/email', [\App\Http\Controllers\UserController::class,'updateEmail']);
+            Route::patch('/{id}/email', [\App\Http\Controllers\UserController::class, 'updateEmail']);
             // 绑定客户手机号
-            Route::patch('/{id}/phone', [\App\Http\Controllers\UserController::class,'updatePhone']);
+            Route::patch('/{id}/phone', [\App\Http\Controllers\UserController::class, 'updatePhone']);
             // 绑定客户头像
-            Route::post('/{id}/avatar', [\App\Http\Controllers\UserController::class,'updateAvatar']);
+            Route::post('/{id}/avatar', [\App\Http\Controllers\UserController::class, 'updateAvatar']);
             // 禁用用户/启用用户
             //            Route::patch('/lock/{id}',[\App\Http\Controllers\UserController::class,'update']);
             // 显示分页客户数据
             Route::get('/', [\App\Http\Controllers\UserController::class, 'paginate']);
             // 显示所有客户
             Route::get('/all', [\App\Http\Controllers\UserController::class, 'index']);
+            // 显示所有用户
+            Route::get('/getAllUsers', [\App\Http\Controllers\UserController::class, 'getAllUsers']);
+            // 显示所有工程师
+            Route::get('/getAllEngineers', [\App\Http\Controllers\UserController::class, 'getAllEngineers']);
             // 根据ID获取客户信息
             Route::get('/{id}', [\App\Http\Controllers\UserController::class, 'show']);
             // 显示筛选客户表单数据
@@ -141,10 +145,27 @@ Route::group(['prefix' => '/v1'], function () {
         Route::get('/orderPage', [\App\Http\Controllers\OrderController::class, 'paginate']);
         // 发布工单
         Route::post('/order', [\App\Http\Controllers\OrderController::class, 'create']);
+        // 根据用户名查询工单
+        Route::post('/getOrderByUsername', [\App\Http\Controllers\OrderController::class, 'getOrderByUsername']);
+        // 获取未分配的工单信息
+        Route::get('/getToBeDoneOrder', [\App\Http\Controllers\OrderController::class, 'getToBeDoneOrder']);
         /*
             工单类型
         */
         // 查询工单类型
         Route::get('/orderType', [\App\Http\Controllers\OrderTypeController::class, 'index']);
+        /*
+            资产
+        */
+        Route::group(['prefix' => '/asset'], function () {
+            // 添加资产
+            Route::post('/add', [\App\Http\Controllers\AssetController::class, 'create']);
+            // 分页显示资产
+            Route::get('/assetPage', [\App\Http\Controllers\AssetController::class, 'paginate']);
+            // 高级查询（多条件查询）
+            Route::post('/query', [\App\Http\Controllers\AssetController::class, 'queryAssetsWithMulti']);
+            // 根据工程师id获取资产
+            Route::post('/queryByEngineerId', [\App\Http\Controllers\AssetController::class, 'getAssetsByEngineerId']);
+        });
     });
 })->middleware('cors');

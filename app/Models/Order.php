@@ -50,7 +50,6 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-    //
     public function getUsernameAttribute()
     {
         $user = User::query()->find($this->user_id);

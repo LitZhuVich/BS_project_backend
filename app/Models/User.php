@@ -68,6 +68,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Order::class);
     }
+    public function asset()
+    {
+        return $this->belongsTo(Asset::class);
+    }
 
     public function groups()
     {

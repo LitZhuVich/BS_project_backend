@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AssetCategorie extends Model
+class AssetModule extends Model
 {
     use HasFactory;
-    protected $fillable = ['asset_name'];
-    // 指定连接的数据表
-    protected $table = 'asset_categories';
+    // 指定连接的数据库
+    protected $table = 'asset_modules';
     protected $hidden = ['id'];
 
     public function asset()
