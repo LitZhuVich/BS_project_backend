@@ -4,50 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class GroupController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * 根据ID显示对应组信息
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show($id)
+    public function show($id):JsonResponse
     {
         try {
             $group = Group::where('id',$id)->with('users')->withCount('users')->first();
@@ -63,9 +35,10 @@ class GroupController extends Controller
     /**
      * 获取所有组信息
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function showUser(){
+    public function showUser():JsonResponse
+    {
         $group = Group::with('users')->withCount('users')->get();
 
         if (!$group){
@@ -84,10 +57,9 @@ class GroupController extends Controller
     /**
      * 显示工程师组信息
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function engineerIndex()
+    public function engineerIndex():JsonResponse
     {
         try {
             $group = Group::with('users')->withCount('users')
@@ -105,9 +77,10 @@ class GroupController extends Controller
      * 获取所有
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function showName(int $id){
+    public function showName(int $id):JsonResponse
+    {
         try {
             $user = User::query()->where('id',$id)->with('groups')->first();
             if (!$user){
@@ -127,9 +100,9 @@ class GroupController extends Controller
     /**
      * 只显示 组名
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function showGroupName()
+    public function showGroupName():JsonResponse
     {
         // 只显示 group_name
         $groups = Group::all()->map(function($group) {
@@ -137,39 +110,5 @@ class GroupController extends Controller
         });
 
         return response()->json($groups,200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

@@ -9,8 +9,6 @@ class Asset extends Model
 {
     use HasFactory;
 
-<<<<<<< HEAD
-=======
     protected $fillable = [
         'id',
         'asset_address',
@@ -69,5 +67,4 @@ class Asset extends Model
         $source = AssetSource::query()->find($this->source_id);
         return $source->source_name;
     }
->>>>>>> 5a91872f2656303908e44943b82d70b35ac12ae8
 }

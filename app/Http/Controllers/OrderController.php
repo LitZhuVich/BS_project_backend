@@ -28,7 +28,8 @@ class OrderController extends Controller
      * 构造函数
      * 为 authUser 全局变量赋值
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->authUser = JWTAuth::parseToken()->authenticate();
         $this->groupController = new GroupController();
     }
@@ -96,35 +97,61 @@ class OrderController extends Controller
      */
     public function create(Request $request)
     {
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
+        // 验证请求数据
+        $validatedData = $request->validate([
+            'priority' => ['required', 'integer'],
+            'status' => ['required', 'integer'],
+            'orderType' => ['required', 'integer'],
+            'phone' => ['nullable', 'integer', 'digits:11'],
+            'title' => ['required'],
+            'timeLimit' => ['required'],
+            'description' => ['nullable'],
+            'isOnLine' => ['required', 'integer'],
+            'address' => ['nullable'],
+            'appointment' => ['nullable'],
+            'engineer_id' => ['integer']
+        ]);
+        $user = JWTAuth::parseToken()->authenticate();
 
-            $date_string = $request->appointment;
-            $time_stamp = strtotime($date_string);
-            $date_time = date("Y-m-d", $time_stamp);
+        $date_string = $request['appointment'];
+        $time_stamp = strtotime($date_string);
+        $date_time = date("Y-m-d", $time_stamp);
+        try {
 
             $data = [
-                'priority_id' => $request->priority,
-                'status_id' => $request->status,
-                'type_id' => $request->orderType,
+                'priority_id' => $validatedData['priority'],
+                'status_id' => $validatedData['status'],
+                'type_id' => $validatedData['orderType'],
                 'user_id' => $user->id,
-                'phone' => $request->phone,
-                'title' => $request->title,
-                'time_limit' => $request->timeLimit,
-                'description' => $request->description,
-                'isOnLine' => $request->isOnLine,
-                'address' => $request->address,
+                'phone' => $validatedData['phone'],
+                'title' => $validatedData['title'],
+                'time_limit' => $validatedData['timeLimit'],
+                'description' => $validatedData['description'],
+                'isOnLine' => $validatedData['isOnLine'],
+                'address' => $validatedData['address'],
                 'appointment' => $date_time,
+                'engineer_id' => $validatedData['engineer_id']
             ];
 
             $order = Order::create($data);
+            if (!$order) {
+                return response()->json('发布失败！', 400);
+            }
             // 返回结果
-            return response()->json($order, 200);
+            return response()->json('发布成功！', 200);
         } catch (\Throwable $e) {
             return response()->json('失败' . $e->getMessage(), 400);
         }
     }
-
+    // 根据指定工程师查询工单
+    public function queryOrderByEngId(int $id)
+    {
+        $data = Order::query()->where('engineer_id', $id)->count();
+        if (!$data) {
+            return response()->json(0, 400);
+        }
+        return response()->json($data, 200);
+    }
     /**
      * 显示指定用户工程师或管理员处理的工单
      *
@@ -145,8 +172,8 @@ class OrderController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $data = Order::query()->where('id',$id)->get();
-        return response()->json($data,200);
+        $data = Order::query()->where('id', $id)->get();
+        return response()->json($data, 200);
     }
     public function showSuccessOrder()
     {
@@ -169,8 +196,8 @@ class OrderController extends Controller
      */
     public function showStatus(int $status_id): JsonResponse
     {
-        $data = Order::query()->where('status_id',$status_id)->get();
-        return response()->json($data,200);
+        $data = Order::query()->where('status_id', $status_id)->get();
+        return response()->json($data, 200);
     }
 
     /**
@@ -181,9 +208,9 @@ class OrderController extends Controller
      */
     public function showMyStatus(int $status_id): JsonResponse
     {
-        $data = Order::query()->where('status_id',$status_id)
-            ->where('user_id',$this->authUser->id)->get();
-        return response()->json($data,200);
+        $data = Order::query()->where('status_id', $status_id)
+            ->where('user_id', $this->authUser->id)->get();
+        return response()->json($data, 200);
     }
 
     /**
@@ -194,9 +221,9 @@ class OrderController extends Controller
      */
     public function showMyPriority(int $priority_id): JsonResponse
     {
-        $data = Order::query()->where('priority_id',$priority_id)
-            ->where('user_id',$this->authUser->id)->get();
-        return response()->json($data,200);
+        $data = Order::query()->where('priority_id', $priority_id)
+            ->where('user_id', $this->authUser->id)->get();
+        return response()->json($data, 200);
     }
 
     /**
@@ -210,8 +237,8 @@ class OrderController extends Controller
      */
     public function showPriority(int $priority_id): JsonResponse
     {
-        $data = Order::query()->where('priority_id',$priority_id)->get();
-        return response()->json($data,200);
+        $data = Order::query()->where('priority_id', $priority_id)->get();
+        return response()->json($data, 200);
     }
 
     /**
@@ -286,13 +313,13 @@ class OrderController extends Controller
                 ->where('user_id', $this->authUser->id)
                 ->count();
             // 将总数输入到数组中
-           $data[] = $count;
+            $data[] = $count;
         }
 
         return response()->json([
             'dateDay' => $data,
-            'today' => "今天是".$weekdayName
-        ],200);
+            'today' => "今天是" . $weekdayName
+        ], 200);
     }
 
     /**
@@ -335,7 +362,7 @@ class OrderController extends Controller
         }
 
         return Order::query()
-            ->where('status_id',4)
+            ->where('status_id', 4)
             ->whereIn('user_id', function ($query) use ($groupIds) {
                 return $query->select('user_id')
                     ->from('group_users')
