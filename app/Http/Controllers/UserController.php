@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -35,12 +36,13 @@ class UserController extends Controller
     /**
      * 显示所有数据
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function index()
+    public function index():JsonResponse
     {
         // 接收要查询的数据类型
-        $user = User::query()->with('groups')->withCount('groups')->where('role_id', 1)->get();
+        $user = User::query()->with('groups')->withCount('groups')
+            ->where('role_id', 1)->get();
         if (!$user) {
             return response()->json('获取失败', 400);
         }
@@ -52,9 +54,9 @@ class UserController extends Controller
      * 使用类似： '/CustomerRepresentative?pageSize=10' 方式调用
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function paginate(Request $request)
+    public function paginate(Request $request):JsonResponse
     {
         // 页面数据大小
         $page_size = $request->input('pageSize');
@@ -72,9 +74,9 @@ class UserController extends Controller
      * 查询搜索框筛选之后的数据
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function showFilter(Request $request)
+    public function showFilter(Request $request):JsonResponse
     {
         try {
             // 页面数据大小
@@ -87,7 +89,8 @@ class UserController extends Controller
             $allowedFields = ['companyname', 'username', 'phone'];
             $field = in_array($searchType, $allowedFields) ? $searchType : 'companyname';
             // 使用模糊查询获取数据
-            $filteredData = User::query()->where($field, 'like', "%$searchValue%")->where('role_id', 1)
+            $filteredData = User::query()
+                ->where($field, 'like', "%$searchValue%")->where('role_id', 1)
                 ->with('groups')->withCount('groups')->paginate($page_size);
             return response()->json($filteredData, 200);
         } catch (\Throwable $e) {
@@ -99,12 +102,15 @@ class UserController extends Controller
      * 根据用户ID获取用户信息
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function show(int $id)
+    public function show(int $id):JsonResponse
     {
         try {
-            $user = User::query()->where('id', $id)->where('role_id',1)->with('groups')->withCount('groups')->first();
+            $user = User::query()
+                ->where('id', $id)
+                ->where('role_id',1)
+                ->with('groups')->withCount('groups')->first();
             if (!$user) {
                 return response()->json('获取失败，该用户不存在', 400);
             }
@@ -118,9 +124,9 @@ class UserController extends Controller
      * 删除客户,需要管理员权限
      *
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function destroy(int $id)
+    public function destroy(int $id):JsonResponse
     {
         $user = User::find($id);
         if (!$user) {
@@ -140,9 +146,9 @@ class UserController extends Controller
      * 通过客户管理页面新增的客户密码默认是asd123456
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request):JsonResponse
     {
         // 验证请求数据
         $validatedData = $request->validate([
@@ -186,9 +192,9 @@ class UserController extends Controller
      *
      * @param \Illuminate\Http\Request  $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id):JsonResponse
     {
         // 验证请求数据
         $validatedData = $request->validate([
@@ -235,9 +241,9 @@ class UserController extends Controller
      * @param array $validatedData
      * @param string $field
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function updateField(array $validatedData,string $field,int $id)
+    public function updateField(array $validatedData,string $field,int $id):JsonResponse
     {
         try {
             $user = User::find($id);
@@ -266,7 +272,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updateEmail(Request $request,int $id)
+    public function updateEmail(Request $request,int $id):JsonResponse
     {
         $validatedData = $request->validate([
             'email' => ['required', 'email', 'unique:users,email'],
@@ -284,7 +290,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updatePhone(Request $request,int $id)
+    public function updatePhone(Request $request,int $id):JsonResponse
     {
         $validatedData = $request->validate([
             'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
@@ -302,7 +308,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updateUsername(Request $request,int $id)
+    public function updateUsername(Request $request,int $id):JsonResponse
     {
         $validatedData = $request->validate([
             'username' => ['required', 'unique:users,username'],
@@ -320,7 +326,7 @@ class UserController extends Controller
      * @param int $id
      * @return void
      */
-    public function updateAvatar(Request $request,int $id)
+    public function updateAvatar(Request $request,int $id):JsonResponse
     {
         // 执行上传控制器中上传用户头像的方法
         $data = $this->uploadController->userUploadAvatar($request,$id);
@@ -328,7 +334,7 @@ class UserController extends Controller
         return response()->json($data,200);
     }
 
-    public function updatePassword(Request $request,int $id)
+    public function updatePassword(Request $request,int $id):JsonResponse
     {
         $validatedData = $request->validate([
             'password' => ['required', 'string'],
@@ -346,5 +352,7 @@ class UserController extends Controller
      */
     public function lock()
     {
+
     }
+
 }

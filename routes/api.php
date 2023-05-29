@@ -83,6 +83,8 @@ Route::group(['prefix' => '/v1'], function () {
         Route::group(['prefix' => '/group'], function () {
             // 获取所有组信息
             Route::get('/', [\App\Http\Controllers\GroupController::class, 'showUser']);
+            // 获取工程师组信息
+            Route::get('/engineer', [\App\Http\Controllers\GroupController::class, 'engineerIndex']);
             // 显示所有组的名字
             Route::get('/name', [\App\Http\Controllers\GroupController::class, 'showGroupName']);
             // 获取单个组信息
@@ -99,13 +101,37 @@ Route::group(['prefix' => '/v1'], function () {
             // 上传文件
             Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'orderUpload']);
         });
-
+        // 工单分类接口
         Route::group(['prefix'=>'/order'],function (){
-            Route::get('/showSuccessOrder', [\App\Http\Controllers\OrderController::class, 'showSuccessOrder']);
-            Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'showMyOrder']);
+            // 显示自己所有的工单信息
+            Route::get('/showAllOrder', [\App\Http\Controllers\OrderController::class, 'showAllOrder']);
+            // 显示自己所在组的工单信息
+            Route::get('/showGroupOrder', [\App\Http\Controllers\OrderController::class, 'showGroupOrder']);
+            // 显示自己星期的工单信息
+            Route::get('/showWeekOrder/{status_id}', [\App\Http\Controllers\OrderController::class, 'showWeekOrder']);
+            // 显示自己今天的工单信息
+            Route::get('/showWithinTenOrder/{status_id}', [\App\Http\Controllers\OrderController::class, 'showWithinTenOrder']);
+            // 显示不同状态下的工单
+            Route::get('/status/{status_id}', [\App\Http\Controllers\OrderController::class, 'showStatus']);
+            // 显示不同优先级下的工单
+            Route::get('/priority/{priority_id}', [\App\Http\Controllers\OrderController::class, 'showPriority']);
+            // 显示我的在不同状态下的工单
+            Route::get('/status/my/{status_id}', [\App\Http\Controllers\OrderController::class, 'showMyStatus']);
+            // 显示我的在不同优先级下的工单
+            Route::get('/priority/my/{priority_id}', [\App\Http\Controllers\OrderController::class, 'showMyPriority']);
+            // 显示用户工单信息
+            Route::get('/user/{id}', [\App\Http\Controllers\OrderController::class, 'showUser']);
+            // 显示单个工单信息
+            Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'show']);
         });
-
-        //        TODO: cly 你也改成上面用组分类的格式。收到就可以自行删除这段 TODO注释了！
+        // 工单回复接口
+        Route::group(['prefix'=>'/orderReplied'],function (){
+            // 显示总工单回复总数
+            Route::get('/count', [\App\Http\Controllers\OrderReplieController::class, 'showCount']);
+            // 显示自己的工单回复总数
+            Route::get('/myCount', [\App\Http\Controllers\OrderReplieController::class, 'showMyCount']);
+        });
+//        （0代表客户，1代表工程师，2代表管理
         /*
             工单
         */

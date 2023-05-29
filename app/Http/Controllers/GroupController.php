@@ -82,6 +82,26 @@ class GroupController extends Controller
     }
 
     /**
+     * 显示工程师组信息
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function engineerIndex()
+    {
+        try {
+            $group = Group::with('users')->withCount('users')
+                ->where('group_role',1)->first();
+            if (!$group){
+                return response()->json('没有组',400);
+            }
+            return response()->json($group,200);
+        }catch (JWTException $e){
+            return response()->json($e,200);
+        }
+    }
+
+    /**
      * 获取所有
      *
      * @param int $id
