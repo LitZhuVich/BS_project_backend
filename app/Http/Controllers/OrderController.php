@@ -92,7 +92,7 @@ class OrderController extends Controller
     }
     /**
      * 创建工单
-     * TODO: 需要优化
+     * 
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
@@ -369,5 +369,25 @@ class OrderController extends Controller
                     ->whereIn('group_id', $groupIds);
             })
             ->get();
+    }
+    // 更新工单
+    public function update(Request $request)
+    {
+        // 根据传入的ID查询工单
+        $order = Order::find($request->id);
+        if (!$order) {
+            return response()->json('未查询到工单', 400);
+        }
+
+        $order->title = $request->title;
+        $order->time_limit = $request->time_limit;
+        $order->isOnline = $request->isOnline;
+        $order->type_id = $request->order_type;
+        $order->appointment = $request->appointment;
+        $order->address = $request->address;
+        $order->description = $request->description;
+
+        $result = $order->save();
+        return response()->json($result, 200);
     }
 }

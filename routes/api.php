@@ -139,6 +139,8 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/user/{id}', [\App\Http\Controllers\OrderController::class, 'showUser']);
             // 显示单个工单信息
             Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'show']);
+            // 更新工单
+            Route::post('/update', [\App\Http\Controllers\OrderController::class, 'update']);
         });
         // 工单回复接口
         Route::group(['prefix' => '/orderReplied'], function () {
