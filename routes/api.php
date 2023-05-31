@@ -25,7 +25,7 @@ Route::group(['prefix' => '/v1'], function () {
     // 登录接口
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
     // 测试接口
-    Route::get('/asd', function () {
+    Route::get('/', function () {
         return '1123';
     });
     // 刷新用户的token
@@ -83,10 +83,19 @@ Route::group(['prefix' => '/v1'], function () {
             // 显示筛选客户表单数据
             Route::post('/filter', [\App\Http\Controllers\UserController::class, 'showFilter']);
         });
+        // 工程师分页
+        Route::get('/engineerPaginate',[\App\Http\Controllers\UserController::class,'engineerPaginate']);
+        Route::get('/engineerFilter',[\App\Http\Controllers\UserController::class,'showEngineerFilter']);
         // 组分类接口
         Route::group(['prefix' => '/group'], function () {
             // 获取所有组信息
             Route::get('/', [\App\Http\Controllers\GroupController::class, 'showUser']);
+            // 删除组
+            Route::delete('/{id}', [\App\Http\Controllers\GroupController::class, 'destroy']);
+            // 工程师组分页
+            Route::get('/engineerPaginate',[\App\Http\Controllers\GroupController::class,'engineerPaginate']);
+            // 工程师组搜索
+            Route::get('/engineerFilter',[\App\Http\Controllers\GroupController::class,'showEngineerFilter']);
             // 获取工程师组信息
             Route::get('/engineer', [\App\Http\Controllers\GroupController::class, 'engineerIndex']);
             // 显示所有组的名字
@@ -95,6 +104,20 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/{id}', [\App\Http\Controllers\GroupController::class, 'show']);
             // 获取用户组名
             Route::get('/name/{id}', [\App\Http\Controllers\GroupController::class, 'showName']);
+        });
+        // 技能分类接口
+        Route::group(['prefix'=>'/skill'],function (){
+            // 显示所有技能
+            Route::get('/',[\App\Http\Controllers\SkillController::class,'index']);
+            // 显示技能分页
+            Route::get('/paginate',[\App\Http\Controllers\SkillController::class,'paginate']);
+            // 显示查询后的数据
+            Route::get('/showFilter',[\App\Http\Controllers\SkillController::class,'showFilter']);
+            Route::get('/name',[\App\Http\Controllers\SkillController::class,'showName']);
+            // 根据技能显示人
+            Route::get('/{id}',[\App\Http\Controllers\SkillController::class,'show']);
+            // 删除技能
+            Route::delete('/{id}',[\App\Http\Controllers\SkillController::class,'destroy']);
         });
         // 文件分类接口
         Route::group(['prefix' => '/file'], function () {
@@ -135,7 +158,6 @@ Route::group(['prefix' => '/v1'], function () {
             // 显示自己的工单回复总数
             Route::get('/myCount', [\App\Http\Controllers\OrderReplieController::class, 'showMyCount']);
         });
-//        （0代表客户，1代表工程师，2代表管理
         /*
             工单
         */
