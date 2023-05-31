@@ -325,7 +325,7 @@ class UserController extends Controller
             }
 
             if ($field == "password") {
-                $user->password = Hash::make($validatedData["password"], ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']);
+                $user->password = Hash::make($validatedData["$field"], ['memory' => 1024, 'time' => 2, 'threads' => 2, 'argon2i']);
             } else {
                 $user->$field = $validatedData["$field"];
             }
@@ -336,42 +336,6 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return '修改失败';
         }
-    }
-
-    /**
-     * 绑定邮箱
-     *
-     * @param Request $request
-     * @param int $id
-     * @return void
-     */
-    public function updateEmail(Request $request, int $id): JsonResponse
-    {
-        $validatedData = $request->validate([
-            'email' => ['required', 'email', 'unique:users,email'],
-        ]);
-
-        $data = $this->updateField($validatedData, 'email', $id);
-
-        return response()->json(['message' => '修改成功', 'email' => $data->email], 200);
-    }
-
-    /**
-     * 绑定手机号
-     *
-     * @param Request $request
-     * @param int $id
-     * @return void
-     */
-    public function updatePhone(Request $request, int $id): JsonResponse
-    {
-        $validatedData = $request->validate([
-            'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
-        ]);
-
-        $data = $this->updateField($validatedData, 'phone', $id);
-
-        return response()->json(['message' => '修改成功', 'phone' => $data->phone], 200);
     }
 
     /**
@@ -389,8 +353,45 @@ class UserController extends Controller
 
         $data = $this->updateField($validatedData, 'username', $id);
 
-        return response()->json(['message' => '修改成功', 'username' => $data->username], 200);
+        return response()->json(['message' => '修改成功', 'username' => $data], 200);
     }
+
+    /**
+     * 绑定邮箱
+     *
+     * @param Request $request
+     * @param int $id
+     * @return void
+     */
+    public function updateEmail(Request $request, int $id): JsonResponse
+    {
+        $validatedData = $request->validate([
+            'email' => ['required', 'email', 'unique:users,email'],
+        ]);
+
+        $data = $this->updateField($validatedData, 'email', $id);
+
+        return response()->json(['message' => '修改成功', 'email' => $data], 200);
+    }
+
+    /**
+     * 绑定手机号
+     *
+     * @param Request $request
+     * @param int $id
+     * @return void
+     */
+    public function updatePhone(Request $request, int $id): JsonResponse
+    {
+        $validatedData = $request->validate([
+            'phone' => ['required', 'regex:/^[1][3-9][0-9]{9}$/', 'unique:users,phone'],
+        ]);
+
+        $data = $this->updateField($validatedData, 'phone', $id);
+
+        return response()->json(['message' => '修改成功', 'phone' => $data], 200);
+    }
+
 
     /**
      * 绑定头像
