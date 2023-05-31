@@ -49,6 +49,8 @@ class User extends Authenticatable implements JWTSubject
         'pivot',
     ];
 
+    protected $appends = ['skill_proficiency'];
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -68,10 +70,19 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Order::class);
     }
+    public function asset()
+    {
+        return $this->belongsTo(Asset::class);
+    }
 
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_users');
+    }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'user_skill');
     }
 
     public function username()
@@ -79,19 +90,24 @@ class User extends Authenticatable implements JWTSubject
         return 'username';
     }
 
-    public function isAdmin()
+    public function getSkillProficiencyAttribute()
+    {
+        return UserSkill::query()->where('user_id',$this->id)->pluck('skill_proficiency')->first();
+    }
+
+    public function isAdmin(): bool
     {
         // 权限等于 3 是管理员
         return $this->role_id === 3;
     }
 
-    public function isEngineer()
+    public function isEngineer(): bool
     {
         // 权限等于 2 是工程师
         return $this->role_id === 2;
     }
 
-    public function isCustomerRepresentative()
+    public function isCustomerRepresentative(): bool
     {
         // 权限等于 1 == 客户代表
         return $this->role_id === 1;

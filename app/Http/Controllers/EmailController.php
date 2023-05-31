@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\AuthPost;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -14,9 +15,9 @@ class EmailController extends Controller
      * 发送邮箱验证码
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function sendEmailToken(Request $request)
+    public function sendEmailToken(Request $request):JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
@@ -38,9 +39,9 @@ class EmailController extends Controller
      * 验证邮箱
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function verifyEmail(Request $request)
+    public function verifyEmail(Request $request):JsonResponse
     {
         $user = User::where('email_verification_token', $request->input('token'))->first();
 

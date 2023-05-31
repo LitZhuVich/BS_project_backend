@@ -16,7 +16,6 @@ class ApiResponseMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        /** @var LaravelResponse */
         $response = $next($request);
         $data = '';
 

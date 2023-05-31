@@ -9,8 +9,6 @@ class Order extends Model
 {
     use HasFactory;
 
-    // public $timestamps = false;
-
     protected $fillable = [
         'priority_id',
         'status_id',
@@ -23,10 +21,11 @@ class Order extends Model
         'attachment',
         'isOnLine',
         'address',
-        'appointment'
+        'appointment',
+        'engineer_id'
     ];
 
-    protected $appends = ['username', 'status', 'type', 'priority'];
+    protected $appends = ['username', 'status', 'type', 'priority', 'engineer'];
 
     protected $casts = [
         'created_at' => 'date:Y-m-d H:i:s',
@@ -52,11 +51,22 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-    //
+    public function engineer()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function getUsernameAttribute()
     {
         $user = User::query()->find($this->user_id);
         return $user->username;
+    }
+    public function getEngineerAttribute()
+    {
+        if ($this->engineer_id != 0) {
+            $engineer = User::query()->where('role_id', 2)->find($this->engineer_id);
+            return $engineer->username;
+        }
+        return '无';
     }
 
     public function getStatusAttribute()
