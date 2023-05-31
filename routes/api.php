@@ -129,7 +129,19 @@ Route::group(['prefix' => '/v1'], function () {
             Route::post('/upload', [\App\Http\Controllers\UploadController::class, 'orderUpload']);
         });
         // 工单分类接口
-        Route::group(['prefix'=>'/order'],function (){
+        Route::group(['prefix' => '/order'], function () {
+            // 获取全部工单
+            Route::get('/', [\App\Http\Controllers\OrderController::class, 'index']);
+            // 分页显示工单
+            Route::get('/orderPage', [\App\Http\Controllers\OrderController::class, 'paginate']);
+            // 发布工单
+            Route::post('/', [\App\Http\Controllers\OrderController::class, 'create']);
+            // 根据工程师ID查询工单数量
+            Route::get('/countOrders/{id}', [\App\Http\Controllers\OrderController::class, 'queryOrderByEngId']);
+            // 根据用户名查询工单
+            Route::post('/getOrderByUsername', [\App\Http\Controllers\OrderController::class, 'getOrderByUsername']);
+            // 获取未分配的工单信息
+            Route::get('/getToBeDoneOrder', [\App\Http\Controllers\OrderController::class, 'getToBeDoneOrder']);
             // 显示自己所有的工单信息
             Route::get('/showAllOrder', [\App\Http\Controllers\OrderController::class, 'showAllOrder']);
             // 显示自己所在组的工单信息
@@ -150,9 +162,11 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/user/{id}', [\App\Http\Controllers\OrderController::class, 'showUser']);
             // 显示单个工单信息
             Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'show']);
+            // 更新工单
+            Route::post('/update', [\App\Http\Controllers\OrderController::class, 'update']);
         });
         // 工单回复接口
-        Route::group(['prefix'=>'/orderReplied'],function (){
+        Route::group(['prefix' => '/orderReplied'], function () {
             // 显示总工单回复总数
             Route::get('/count', [\App\Http\Controllers\OrderReplieController::class, 'showCount']);
             // 显示自己的工单回复总数

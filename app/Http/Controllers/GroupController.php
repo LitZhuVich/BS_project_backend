@@ -155,8 +155,6 @@ class GroupController extends Controller
         }
     }
 
-
-
     /**
      * 只显示 组名
      *
