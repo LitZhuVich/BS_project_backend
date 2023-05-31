@@ -38,24 +38,25 @@ class AssetController extends Controller
         $asset_address = $request->asset_address;
         $asset_categorie_id = $request->asset_categorie_id;
 
-        $result = Asset::when($asset_name, function ($query, $asset_name) {
-            $query->where('asset_name', $asset_name);
+        $result = Asset::query()
+                ->when($asset_name, function ($query, $asset_name) {
+            $query->where('asset_name','like',$asset_name);
         })->when($module_id, function ($query, $module_id) {
-            $query->where('module_id', $module_id);
+            $query->where('module_id','like',$module_id);
         })->when($asset_serial, function ($query, $asset_serial) {
-            $query->where('asset_serial', $asset_serial);
+            $query->where('asset_serial','like', $asset_serial);
         })->when($user_id, function ($query, $user_id) {
-            $query->where('user_id', $user_id);
+            $query->where('user_id','like', $user_id);
         })->when($model_id, function ($query, $model_id) {
-            $query->where('model_id', $model_id);
+            $query->where('model_id','like', $model_id);
         })->when($source_id, function ($query, $source_id) {
-            $query->where('source_id', $source_id);
+            $query->where('source_id','like', $source_id);
         })->when($asset_warranty, function ($query, $asset_warranty) {
-            $query->where('asset_warranty', $asset_warranty);
+            $query->where('asset_warranty', 'like',$asset_warranty);
         })->when($asset_address, function ($query, $asset_address) {
-            $query->where('asset_address', $asset_address);
+            $query->where('asset_address','like', $asset_address);
         })->when($asset_categorie_id, function ($query, $asset_categorie_id) {
-            $query->where('asset_categorie_id', $asset_categorie_id);
+            $query->where('asset_categorie_id','like', $asset_categorie_id);
         })->paginate($page_size);
 
         if (!$result) {
@@ -64,7 +65,7 @@ class AssetController extends Controller
         return response()->json($result, 200);
     }
     // 添加资产
-    public function create(Request $request) //TODO: 验证需要优化
+    public function create(Request $request)
     {
         // 表单验证
         $validator = Validator::make($request->all(), [
