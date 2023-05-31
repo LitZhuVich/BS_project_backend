@@ -164,6 +164,8 @@ Route::group(['prefix' => '/v1'], function () {
             Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'show']);
             // 更新工单
             Route::post('/update', [\App\Http\Controllers\OrderController::class, 'update']);
+            // 删除工单
+            Route::get('/delete/{id}', [\App\Http\Controllers\OrderController::class, 'delete']);
         });
         // 工单回复接口
         Route::group(['prefix' => '/orderReplied'], function () {

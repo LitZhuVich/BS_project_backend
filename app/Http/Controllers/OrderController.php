@@ -384,4 +384,15 @@ class OrderController extends Controller
         $result = $order->save();
         return response()->json($result, 200);
     }
+    // 删除工单
+    public function delete($id)
+    {
+        $order = Order::find($id);
+        $result = $order->delete();
+
+        if (!$result) {
+            return response()->json($result, 400);
+        }
+        return response()->json($result, 200);
+    }
 }
